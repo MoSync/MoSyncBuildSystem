@@ -1,0 +1,106 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>This checksout the Reload source tarball that will be used by later steps of a MoSync build, as well as for publishing</description>
+  <logRotator>
+    <daysToKeep>7</daysToKeep>
+    <numToKeep>30</numToKeep>
+    <artifactDaysToKeep>7</artifactDaysToKeep>
+    <artifactNumToKeep>30</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>TIMESTAMP</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>REPO</name>
+          <description></description>
+          <defaultValue>MoSync</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>BRANCH</name>
+          <description></description>
+          <defaultValue>master</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>CLONE_REPOS</name>
+          <description></description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>BUILD_INFO</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>master</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!bash
+if [[ $REPO =~ :// ]] || [[ $REPO =~ @ ]]; then
+ echo &quot;Using custom Reload repo&quot;
+else
+ echo &quot;Using Github Reload repo&quot;
+ REPO=git://github.com/$REPO/Reload.git
+fi
+
+mkdir Reload-trunk
+
+if [ $CLONE_REPOS = false ]; then
+cd $JENKINS_HOME/userContent/MoSyncRepos/Reload
+git fetch $REPO $BRANCH
+git rev-parse FETCH_HEAD &gt; $WORKSPACE/ReloadHash
+cd $WORKSPACE
+git archive -o ReloadSrc.tar --remote=$JENKINS_HOME/userContent/MoSyncRepos/Reload FETCH_HEAD
+cd Reload-trunk
+tar -xvf ../ReloadSrc.tar
+
+else
+git clone $REPO Reload-trunk
+cd Reload-trunk
+git checkout $BRANCH
+git rev-parse $BRANCH &gt; $WORKSPACE/ReloadHash
+
+fi
+echo &quot;$BUILD_INFO&quot; &gt; buildInfo.txt</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>cd Reload-trunk
+tar -cf ../ReloadSrc.tar --exclude=&quot;.git*&quot; *
+cd ..
+
+#tar -cf ReloadSrc.tar --exclude=&quot;.git*&quot; Reload-trunk
+
+bzip2 -z -9  ReloadSrc.tar</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>*Src*.tar.bz2</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.Fingerprinter>
+      <targets></targets>
+      <recordBuildArtifacts>true</recordBuildArtifacts>
+    </hudson.tasks.Fingerprinter>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+      <deleteDirs>false</deleteDirs>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>

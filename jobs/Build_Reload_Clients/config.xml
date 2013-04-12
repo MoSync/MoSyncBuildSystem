@@ -1,0 +1,129 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Builds MoSync Reload</description>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>100</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.plugins.copyartifact.BuildSelectorParameter plugin="copyartifact@1.22">
+          <name>MOSYNC_PACKAGE</name>
+          <description>The SDK build that will be used to build Reload</description>
+          <defaultSelector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+        </hudson.plugins.copyartifact.BuildSelectorParameter>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>ios</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+      <projectName>Build_MoSync_SDK</projectName>
+      <filter>*.dmg</filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.ParameterizedBuildSelector">
+        <parameterName>MOSYNC_PACKAGE</parameterName>
+      </selector>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+      <projectName>Prepare_Reload_Source_Tarball</projectName>
+      <filter>ReloadSrc.tar.bz2</filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.tasks.Shell>
+      <command>mkdir Reload-trunk
+bzip2 -d ReloadSrc.tar.bz2
+cd Reload-trunk
+tar -x -f ../ReloadSrc.tar
+cd ..
+
+if [[ $(ls | grep .dmg) =~ ([^/]*)\.dmg ]]; then
+ echo &quot;file name: ${BASH_REMATCH[1]}&quot;
+fi
+FILENAME=${BASH_REMATCH[1]}
+
+hdiutil attach $FILENAME.dmg
+cp /Volumes/$FILENAME/$FILENAME.pkg/Contents/Archive.pax.gz .
+hdiutil detach /Volumes/$FILENAME
+gzip -d Archive.pax.gz
+pax -r &lt; Archive.pax
+
+ln -s $WORKSPACE/Applications/MoSync/eclipse/mosync.app $WORKSPACE/Applications/MoSync/MoSync
+chmod -R 777 $WORKSPACE/Applications/MoSync/eclipse/configuration
+chmod 755 $WORKSPACE/Applications/MoSync/eclipse/mosync.app/Contents/MacOS/mosync
+ln -s $WORKSPACE/Applications/MoSync/eclipse/mosync.app/Contents/MacOS/mosync $WORKSPACE/Applications/MoSync/eclipse/mosyncc
+
+
+
+</command>
+    </hudson.tasks.Shell>
+    <hudson.plugins.ruby.Ruby plugin="ruby@1.2">
+      <command>require &quot;fileutils&quot;
+
+MOSYNCDIR = ENV[&apos;WORKSPACE&apos;] + &quot;/Applications/MoSync&quot;
+#Defince version and timestamp 
+version = &quot;1.0&quot;
+time_stamp = Time.now.strftime(&quot;%Y%m%d-%H%M&quot;)[2..-1]
+
+FileUtils.mkdir_p &quot;ReloadServer/UI/docs&quot;
+
+#Write the version information to the file for use in the server  and client
+File.open(&quot;ReloadServer/build.dat&quot;, &quot;w&quot;) do |file|
+  file.puts(&quot;MoSync Reload Version #{version}&quot;)
+  file.puts(time_stamp);
+end
+
+FileUtils.cp &quot;ReloadServer/build.dat&quot;, &quot;Reload-trunk/ReloadClient/Resources/information&quot;
+FileUtils.cp MOSYNCDIR + &quot;/bin/version.dat&quot;, &quot;ReloadServer/MoSyncVersion.dat&quot;
+FileUtils.cp_r MOSYNCDIR + &quot;/eclipse/plugins/com.mobilesorcery.sdk.help_1.0.0/docs/html5&quot;, &quot;ReloadServer/UI/docs&quot;</command>
+    </hudson.plugins.ruby.Ruby>
+    <hudson.tasks.Shell>
+      <command>cd Reload-trunk
+#mkdir workspace
+#MOSYNCDIR=$WORKSPACE/Applications/MoSync $WORKSPACE/Applications/MoSync/eclipse/mosyncc -nosplash -application com.mobilesorcery.sdk.builder.headless -data $PWD/workspace -import #$PWD/ReloadClient
+#cd $WORKSPACE
+#mkdir Clients
+#cd Clients
+#mkdir Android
+#mkdir iOS
+#mkdir WindowsPhone
+#cd ..
+#mv Reload-trunk/Reloadclient/Output/Release/Android/Android/package/ReloadClient.apk Clients/Android/
+#mv Reload-trunk/Reloadclient/Output/Release/Windows\ Phone/7/package/project/* Clients/WindowsPhone/
+#mv Reload-trunk/Reloadclient/Output/Release/iOS/iPhone/package/xcode-proj/* Clients/iOS/
+#rm -r Clients/iOS/build
+
+cd ReloadClient
+
+MOSYNCDIR=$WORKSPACE/Applications/MoSync ruby workfile.rb
+cd ..
+mv ReloadClient/Clients ./
+
+zip -r9 $WORKSPACE/ReloadClientsAndDocs.zip ReloadServer Clients</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>ReloadClientsAndDocs.zip</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+      <deleteDirs>false</deleteDirs>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>

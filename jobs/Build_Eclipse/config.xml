@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Builds the Eclipse IDE for the MoSync SDK</description>
+  <logRotator>
+    <daysToKeep>7</daysToKeep>
+    <numToKeep>10</numToKeep>
+    <artifactDaysToKeep>7</artifactDaysToKeep>
+    <artifactNumToKeep>10</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.BooleanParameterDefinition>
+          <name>ECLIPSE_EXPERIMENTAL</name>
+          <description>Use the experimental eclipse platform</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>Eclipse</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.copyartifact.CopyArtifact>
+      <projectName>Prepare_MoSync_Source_Tarball</projectName>
+      <filter>EclipseSrc.tar.bz2</filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
+        <id>lastBuild</id>
+      </selector>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.tasks.Shell>
+      <command>mkdir eclipse-trunk
+bzip2 -d EclipseSrc.tar.bz2
+cd eclipse-trunk
+tar -x -f ../EclipseSrc.tar
+
+cd $WORKSPACE
+cp ../target-platform-$ECLIPSE_VERSION.zip eclipse-trunk/com.mobilesorcery.sdk.product/build/target-platform.zip
+</command>
+    </hudson.tasks.Shell>
+    <hudson.plugins.ruby.Ruby>
+      <command>require &apos;fileutils&apos;
+
+@splash = &quot;&quot;
+FileUtils.cd(&quot;eclipse-trunk&quot;)
+if(File.exist?(&quot;splash.dat&quot;))
+	puts &quot;splash.dat exists&quot;
+	File.open(&quot;splash.dat&quot;, &quot;r&quot;) do |infile|
+		@splash = infile.gets
+	end
+end
+
+puts &quot;Splash:&quot;
+puts @splash
+
+FileUtils.cd(&quot;SplashScreenGenerator&quot;)
+system(&quot;ruby main.rb &quot; + @splash)
+FileUtils.cp_r(&quot;splash.bmp&quot;, ENV[&quot;WORKSPACE&quot;] + &quot;/eclipse-trunk/com.mobilesorcery.sdk.product/&quot;)
+FileUtils.cp_r(&quot;installer_splash.bmp&quot;, ENV[&quot;WORKSPACE&quot;] + &quot;/installer_splash.bmp&quot;)</command>
+    </hudson.plugins.ruby.Ruby>
+    <hudson.tasks.Shell>
+      <command>cd eclipse-trunk/com.mobilesorcery.sdk.product/build
+ant release
+
+mv buildresult/I.MoSync/MoSync-*-trimmed.zip $WORKSPACE/</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>installer_splash.bmp, MoSync-*-trimmed.zip</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.Fingerprinter>
+      <targets></targets>
+      <recordBuildArtifacts>true</recordBuildArtifacts>
+    </hudson.tasks.Fingerprinter>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup>
+      <deleteDirs>false</deleteDirs>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>

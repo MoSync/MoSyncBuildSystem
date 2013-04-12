@@ -1,0 +1,212 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <logRotator>
+    <daysToKeep>7</daysToKeep>
+    <numToKeep>30</numToKeep>
+    <artifactDaysToKeep>7</artifactDaysToKeep>
+    <artifactNumToKeep>30</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>winmosync</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+      <projectName>Prepare_MoSync_Source_Tarball</projectName>
+      <filter>MoSyncSrc.tar.bz2</filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
+        <id>lastBuild</id>
+      </selector>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.tasks.BatchFile>
+      <command>mkdir mosync-trunk
+7z x MoSyncSrc.tar.bz2
+7z x MoSyncSrc.tar -omosync-trunk
+
+mkdir mosync-trunk\include
+mkdir mosync-trunk\lib
+mkdir mosync-trunk\lib\pipe
+</command>
+    </hudson.tasks.BatchFile>
+    <hudson.tasks.BatchFile>
+      <command>mkdir MoSyncPackage
+mkdir MoSyncPackage\bin
+mkdir MoSyncPackage\skins
+mkdir MoSyncPackage\etc
+mkdir MoSyncPackage\lib
+mkdir MoSyncPackage\lib\pipe
+mkdir MoSyncPackage\include
+mkdir MoSyncPackage\docs
+mkdir MoSyncPackage\libexec
+mkdir MoSyncPackage\libexec\gcc
+mkdir MoSyncPackage\libexec\gcc\mapip
+mkdir MoSyncPackage\libexec\gcc\mapip\3.4.6
+mkdir MoSyncPackage\examples
+mkdir MoSyncPackage\profiles
+mkdir MoSyncPackage\mapip
+mkdir MoSyncPackage\mapip\bin
+mkdir MoSyncPackage\eclipse
+mkdir MoSyncPackage\eclipse\plugins
+mkdir MoSyncPackage\eclipse\plugins\com.mobilesorcery.sdk.help_1.0.0
+mkdir MoSyncPackage\eclipse\plugins\com.mobilesorcery.sdk.help_1.0.0\docs</command>
+    </hudson.tasks.BatchFile>
+    <hudson.tasks.BatchFile>
+      <command>cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin/* MoSyncPackage/bin/
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mapip_bin/* MoSyncPackage/mapip/bin/
+cp -r mosync-trunk/skins/* MoSyncPackage/skins/
+cp -r mosync-trunk/MoSyncRules.rules MoSyncPackage/
+
+cp -r mosync-trunk/runtimes/java/platforms/android/AndroidProject/res/drawable/* MoSyncPackage/etc/ || cp -r mosync-trunk/runtimes/java/platforms/androidJNI/AndroidProject/res/drawable/* MoSyncPackage/etc/
+cp -r mosync-trunk/runtimes/java/platforms/android/mosync.keystore MoSyncPackage/etc/ || cp -r mosync-trunk/runtimes/java/platforms/androidJNI/mosync.keystore MoSyncPackage/etc/
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mapip_bin/* MoSyncPackage/libexec/gcc/mapip/3.4.6/
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin/version.dat MoSyncPackage/bin/
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/bin/Batik MoSyncPackage/bin/
+cp -r mosync-trunk/rules MoSyncPackage/
+cp -r mosync-trunk/runtimes/java/platforms/android/default.icon MoSyncPackage/etc/ || cp -r mosync-trunk/runtimes/java/platforms/androidJNI/default.icon MoSyncPackage/etc/</command>
+    </hudson.tasks.BatchFile>
+    <hudson.tasks.BatchFile>
+      <command>set MOSYNCDIR=%WORKSPACE%/MoSyncPackage
+cd %WORKSPACE%/mosync-trunk
+
+ruby workfile.rb
+if %errorlevel% neq 0 exit /b %errorlevel%
+ruby workfile.rb CONFIG=
+if %errorlevel% neq 0 exit /b %errorlevel%
+ruby workfile.rb USE_NEWLIB=
+if %errorlevel% neq 0 exit /b %errorlevel%
+ruby workfile.rb CONFIG= USE_NEWLIB=
+if %errorlevel% neq 0 exit /b %errorlevel%</command>
+    </hudson.tasks.BatchFile>
+    <hudson.plugins.ruby.Ruby plugin="ruby@1.2">
+      <command>require &apos;fileutils&apos;
+
+@sourceDir = ENV[&quot;WORKSPACE&quot;] + &quot;/mosync-trunk&quot;
+@mosyncDir =ENV[&quot;WORKSPACE&quot;] + &quot;/MoSyncPackage&quot;
+ENV[&quot;MOSYNCDIR&quot;] = @mosyncDir
+curDir = FileUtils.pwd
+
+def copyFiles(sourcePath, destPath)
+	puts &quot;Copying #{sourcePath} ----to---- #{destPath}&quot;
+	fileName = File.basename(sourcePath)
+	copyPath = File.dirname(sourcePath)
+	if fileName.include?(&quot;*&quot;)
+	d = Dir.new(copyPath)
+	tempFileList = d.entries
+	tempList = tempFileList.select { |item| item != &quot;.&quot; &amp;&amp; item != &quot;..&quot;}
+	absFileName = fileName.delete(&quot;*&quot;)
+	if (!absFileName.empty?)
+	tempList.delete_if { |item|  !item.include?(absFileName) }
+	end
+	else
+	tempList = [sourcePath]
+	end
+	tempList.each do |item|
+		if (fileName.include?(&quot;*&quot;))
+			FileUtils.cp_r(&quot;#{copyPath}/#{item}&quot;, destPath)
+		else
+			FileUtils.cp_r(&quot;#{item}&quot;, destPath)
+		end
+	end
+end
+
+if(File.exist?(&quot;#{@sourceDir}/libs/Wormhole/jslib/buildJS.rb&quot;))
+	FileUtils.cd &quot;#{@sourceDir}/libs/Wormhole/jslib/&quot;
+
+	%x(ruby buildJS.rb all)
+	FileUtils.cd curDir
+end
+FileUtils.cd(&quot;#{@sourceDir}/examples&quot;)
+
+subDirs = Array.new
+type = &quot;&quot;
+File.open(&quot;examples.list&quot;).each do |line|
+	if((!line.include?(&quot;#&quot;))&amp;&amp;(line.strip.start_with?(&quot;[&quot;))&amp;&amp;(line.strip.end_with?(&quot;]&quot;)))
+		type = line.strip[1..-2]
+	end
+	if((!line.include?(&quot;#&quot;))&amp;&amp;(!line.include?(&quot;[&quot;)))
+		if(line.include?(&quot;=&quot;))
+			lineSplit = line.split(&quot;=&quot;)[1].strip
+			if(File.exist?(&quot;#{type}/#{lineSplit}&quot;))
+				subDirs.push(type + File::SEPARATOR + lineSplit)
+			end
+		else
+			if(File.exist?(&quot;#{type}/#{line.strip}&quot;))
+				subDirs.push(type + File::SEPARATOR + line.strip)
+			end
+		end
+	end
+end
+exampleList = subDirs
+
+exampleList.each do |example|
+	if(example.include?(&quot;/&quot;))
+		puts &quot;copying example #{example}&quot;
+		if(!File.exist?(&quot;#{@mosyncDir}/examples/#{example.split(&quot;/&quot;)[0..-2].join(&quot;/&quot;)}&quot;))
+			puts &quot;example : #{@mosyncDir}/examples/#{example.split(&quot;/&quot;)[0..-2].join(&quot;/&quot;)}&quot;
+			FileUtils.mkdir(&quot;#{@mosyncDir}/examples/#{example.split(&quot;/&quot;)[0..-2].join(&quot;/&quot;)}&quot;)
+		end
+		puts &quot;#{example} ---&gt; #{@mosyncDir}/examples/#{example}&quot;
+		copyFiles(&quot;#{example}&quot;, &quot;#{@mosyncDir}/examples/#{example}&quot;)
+	else
+		copyFiles(example, &quot;#{@mosyncDir}/examples/#{example}&quot;)
+	end
+end
+copyFiles(&quot;#{@sourceDir}/examples/examples.list&quot;, &quot;#{@mosyncDir}/examples/&quot;)
+copyFiles(&quot;#{@sourceDir}/examples/*.rb&quot;, &quot;#{@mosyncDir}/examples/&quot;)
+
+copyFiles(&quot;#{@sourceDir}/templates&quot;, &quot;#{@mosyncDir}/templates&quot;)
+FileUtils.cd curDir</command>
+    </hudson.plugins.ruby.Ruby>
+    <hudson.tasks.BatchFile>
+      <command>cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_docs/* MoSyncPackage/docs/
+cp -r mosync-trunk/libs/Doxyfile MoSyncPackage/include/
+cd MoSyncPackage/include
+set MOSYNC_DOXYGEN_OUTPUT_DIR=%WORKSPACE%/MoSyncPackage/docs
+%WORKSPACE%\mosync-trunk\tools\ReleasePackageBuild\build_package_tools\bin\doxygen.exe
+if %errorlevel% neq 0 exit /b %errorlevel%
+rm Doxyfile
+cd %WORKSPACE%
+cp -r MoSyncPackage/docs/html MoSyncPackage/eclipse/plugins/com.mobilesorcery.sdk.help_1.0.0/docs/
+cd mosync-trunk/tools/doxy2cdt
+ruby main.rb -b com.mobilesorcery.sdk.help/docs/html/ %WORKSPACE%\MoSyncPackage/docs/xml/index.xml %WORKSPACE%\MoSyncPackage/apireference.xml
+if %errorlevel% neq 0 exit /b %errorlevel%
+rm -rf %WORKSPACE%\MoSyncPackage/docs/xml
+%WORKSPACE%\mosync-trunk\build\debug\PanicDoc.exe -props &gt;%WORKSPACE%\MoSyncPackage\eclipse\paniccodes.properties
+if %errorlevel% neq 0 exit /b %errorlevel%
+cd %WORKSPACE%</command>
+    </hudson.tasks.BatchFile>
+    <hudson.tasks.BatchFile>
+      <command>cd %WORKSPACE%
+#Broken, the correct ones are build by Build_VS2010
+rm MoSyncPackage/bin/MoRE.exe
+rm MoSyncPackage/bin/gsm_amr.dll
+
+cd MoSyncPackage
+7z a -tzip -mx9 %WORKSPACE%/WindowsLibs.zip *</command>
+    </hudson.tasks.BatchFile>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>WindowsLibs.zip</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.Fingerprinter>
+      <targets></targets>
+      <recordBuildArtifacts>true</recordBuildArtifacts>
+    </hudson.tasks.Fingerprinter>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+      <deleteDirs>false</deleteDirs>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>

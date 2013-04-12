@@ -1,0 +1,227 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>This checksout the MoSync source tarball that will be used by later steps of a MoSync build, as well as for publishing</description>
+  <logRotator>
+    <daysToKeep>7</daysToKeep>
+    <numToKeep>30</numToKeep>
+    <artifactDaysToKeep>7</artifactDaysToKeep>
+    <artifactNumToKeep>30</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>TIMESTAMP</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>BUILD_MODE</name>
+          <description></description>
+          <defaultValue>featured</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>MOSYNC_REPOSITORY</name>
+          <description></description>
+          <defaultValue>MoSync</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>MOSYNC_BRANCH</name>
+          <description></description>
+          <defaultValue>master</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>ECLIPSE_REPOSITORY</name>
+          <description></description>
+          <defaultValue>MoSync</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>ECLIPSE_BRANCH</name>
+          <description></description>
+          <defaultValue>master</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>CLONE_REPOS</name>
+          <description></description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>BUILD_INFO</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>master</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!bash
+if [[ $MOSYNC_REPOSITORY =~ :// ]] || [[ $MOSYNC_REPOSITORY =~ @ ]]; then
+ echo &quot;Using custom MoSync repo&quot;
+else
+ echo &quot;Using Github MoSync repo&quot;
+ MOSYNC_REPOSITORY=git://github.com/$MOSYNC_REPOSITORY/MoSync.git
+fi
+
+mkdir MoSync-trunk
+
+if [ $CLONE_REPOS = false ]; then
+cd $JENKINS_HOME/userContent/MoSyncRepos/MoSync
+git fetch $MOSYNC_REPOSITORY $MOSYNC_BRANCH
+git rev-parse FETCH_HEAD &gt; $WORKSPACE/MoSyncHash
+cd $WORKSPACE
+git archive -o MoSyncSrc.tar --remote=$JENKINS_HOME/userContent/MoSyncRepos/MoSync FETCH_HEAD
+cd MoSync-trunk
+tar -xvf ../MoSyncSrc.tar
+
+else
+git clone $MOSYNC_REPOSITORY MoSync-trunk
+cd MoSync-trunk
+git checkout $MOSYNC_BRANCH
+git rev-parse $MOSYNC_BRANCH &gt; $WORKSPACE/MoSyncHash
+
+fi
+echo &quot;$BUILD_INFO&quot; &gt; buildInfo.txt
+touch tools/ReleasePackageBuild/build_package_tools/mosync_bin/version.dat</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>mkdir Eclipse
+
+if [[ $ECLIPSE_REPOSITORY =~ :// ]] || [[ $ECLIPSE_REPOSITORY =~ @ ]]; then
+ echo &quot;Using custom Eclipse repo&quot;
+else
+ echo &quot;Using Github Eclipse repo&quot;
+ ECLIPSE_REPOSITORY=git://github.com/$ECLIPSE_REPOSITORY/Eclipse.git
+fi
+
+if [ $CLONE_REPOS = false ]; then
+cd $JENKINS_HOME/userContent/MoSyncRepos/Eclipse
+git fetch $ECLIPSE_REPOSITORY $ECLIPSE_BRANCH
+git rev-parse FETCH_HEAD &gt; $WORKSPACE/EclipseHash
+cd $WORKSPACE
+git archive -o EclipseSrc.tar --remote=$JENKINS_HOME/userContent/MoSyncRepos/Eclipse FETCH_HEAD
+cd Eclipse
+tar -xvf ../EclipseSrc.tar
+
+else
+git clone $ECLIPSE_REPOSITORY Eclipse
+cd Eclipse
+git checkout $ECLIPSE_BRANCH
+git rev-parse $ECLIPSE_BRANCH &gt; $WORKSPACE/EclipseHash
+
+fi
+
+touch splash.dat
+cd ..
+
+cp -r MoSync-trunk/tools/SplashScreenGenerator Eclipse/</command>
+    </hudson.tasks.Shell>
+    <hudson.plugins.ruby.Ruby plugin="ruby@1.2">
+      <command>require &apos;fileutils&apos;
+@sourceDir = ENV[&quot;WORKSPACE&quot;]
+buildMode = ENV[&quot;BUILD_MODE&quot;]
+@buildDate = ENV[&quot;TIMESTAMP&quot;]
+@mosyncHash = &quot;&quot;
+@eclipseHash = &quot;&quot;
+@splash = &quot;&quot;
+
+moSyncHashFile = &quot;#{@sourceDir}/MoSyncHash&quot;
+if(File.exist?(moSyncHashFile))
+	puts &quot;moSyncHashFile exists&quot;
+	File.open(moSyncHashFile, &quot;r&quot;) do |infile|
+		@mosyncHash = infile.gets
+	end
+end
+
+eclipseHashFile = &quot;#{@sourceDir}/EclipseHash&quot;
+if(File.exist?(eclipseHashFile))
+	puts &quot;EclipseHash exists&quot;
+	File.open(eclipseHashFile, &quot;r&quot;) do |infile|
+		@eclipseHash = infile.gets
+	end
+end
+
+majorMinorRevision = &quot;#{@sourceDir}/MoSync-trunk/tools/ReleasePackageBuild/major_minor_revision.txt&quot;
+# read major and minor version information
+if(File.exist?(majorMinorRevision))
+	puts &quot;major_minor_revision.txt exists&quot;
+	versionInfo = []
+	File.open(majorMinorRevision, &quot;r&quot;) do |infile|
+		while (line = infile.gets)
+			versionInfo.push(line)
+		end
+	end
+end
+			
+versionSuffix = (versionInfo[2] == nil) ? &quot;&quot;:versionInfo[2].strip
+revisionText = case buildMode
+when &quot;nightly&quot;
+	&quot;Nightly Build&quot;
+when &quot;sandbox&quot;, &quot;macpack&quot;, &quot;winpack&quot;, &quot;re&quot;
+	&quot;Developer Snapshot&quot;
+when &quot;featured&quot;
+	&quot;Version #{versionInfo[0].strip}.#{versionInfo[1].strip} #{versionSuffix}&quot;
+else
+	&quot;Developer\&apos;s Snapshot&quot;
+end
+if(buildMode != &quot;re&quot;)
+	@splash = &quot;\&quot;#{revisionText}\&quot; #{@buildDate.strip} #{@mosyncHash.strip} #{@eclipseHash.strip}&quot;
+else
+	@splash = &quot;\&quot;#{revisionText}\&quot; #{@buildDate.strip} &quot;##{@mosyncHash.strip} #{@eclipseHash.strip}&quot;
+
+end
+File.open(&quot;#{@sourceDir}/MoSync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin/version.dat&quot;, &quot;w&quot;) do |file|
+	file.puts revisionText
+	file.puts &quot;#{@buildDate}&quot;
+	puts &quot;Date : #{@buildDate}&quot;
+	file.puts &quot;#{@mosyncHash}&quot;
+	puts &quot;MoSync Hash: #{@mosyncHash}&quot;
+	file.puts &quot;#{@eclipseHash}&quot;
+	puts &quot;Eclipse Hash:#{@eclipseHash}&quot;
+end
+
+File.open(&quot;#{@sourceDir}/Eclipse/splash.dat&quot;, &quot;w&quot;) do |file|
+	file.puts &quot;#{@splash}&quot;
+end</command>
+    </hudson.plugins.ruby.Ruby>
+    <hudson.tasks.Shell>
+      <command>cd MoSync-trunk
+tar -cf ../MoSyncSrc.tar --exclude=&quot;.git*&quot; *
+cd ..
+cd Eclipse
+tar -cf ../EclipseSrc.tar --exclude=&quot;.git*&quot; *
+cd ..
+
+tar -cf MoSyncSrc-$TIMESTAMP.tar --exclude=&quot;.git*&quot; MoSync-trunk Eclipse
+
+bzip2 -z -9  MoSyncSrc.tar
+bzip2 -z -9  EclipseSrc.tar
+bzip2 -z -9  MoSyncSrc-$TIMESTAMP.tar</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>*Src*.tar.bz2</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.Fingerprinter>
+      <targets></targets>
+      <recordBuildArtifacts>true</recordBuildArtifacts>
+    </hudson.tasks.Fingerprinter>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+      <deleteDirs>false</deleteDirs>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>

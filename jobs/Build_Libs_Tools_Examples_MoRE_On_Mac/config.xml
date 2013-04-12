@@ -1,0 +1,349 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <logRotator>
+    <daysToKeep>7</daysToKeep>
+    <numToKeep>30</numToKeep>
+    <artifactDaysToKeep>7</artifactDaysToKeep>
+    <artifactNumToKeep>30</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>macPackaging</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+      <projectName>Prepare_MoSync_Source_Tarball</projectName>
+      <filter>MoSyncSrc.tar.bz2</filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
+        <id>lastBuild</id>
+      </selector>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.tasks.Shell>
+      <command>mkdir mosync-trunk
+bzip2 -d MoSyncSrc.tar.bz2
+cd mosync-trunk
+tar -x -f ../MoSyncSrc.tar
+
+find . -name &quot;*.sh&quot; -print0 | xargs -0 dos2unix
+#find . -name &quot;*.h&quot; -print0 | xargs -0 dos2unix
+#find . -name &quot;*.cpp&quot; -print0 | xargs -0 dos2unix
+find . -name &quot;*.rb&quot; -print0 | xargs -0 dos2unix
+find . -name &quot;*.idl&quot; -print0 | xargs -0 dos2unix</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>mkdir MoSyncPackage
+mkdir MoSyncPackage/bin
+mkdir MoSyncPackage/rules
+mkdir MoSyncPackage/bin/freetype219
+mkdir MoSyncPackage/bin/freetype219/lib
+mkdir MoSyncPackage/etc
+mkdir MoSyncPackage/bin/ImageMagick
+mkdir MoSyncPackage/libexec
+mkdir MoSyncPackage/libexec/gcc
+mkdir MoSyncPackage/libexec/gcc/mapip
+mkdir MoSyncPackage/libexec/gcc/mapip/3.4.6
+mkdir MoSyncPackage/docs
+mkdir MoSyncPackage/examples
+mkdir MoSyncPackage/examples/Moblet
+mkdir MoSyncPackage/examples/MAUI
+mkdir MoSyncPackage/eclipse
+mkdir MoSyncPackage/eclipse/plugins/
+mkdir MoSyncPackage/eclipse/plugins/com.mobilesorcery.sdk.help_1.0.0
+mkdir MoSyncPackage/eclipse/plugins/com.mobilesorcery.sdk.help_1.0.0/docs/
+
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/libexec MoSyncPackage/
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/xgcc MoSyncPackage/bin/
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/cpp MoSyncPackage/bin/
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin/version.dat MoSyncPackage/bin/
+cp -r mosync-trunk/rules/* MoSyncPackage/rules/
+
+chmod -R +x MoSyncPackage/bin/*
+chmod -R +x MoSyncPackage/libexec/*</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>cd mosync-trunk
+MOSYNCDIR=$WORKSPACE/MoSyncPackage ruby ./workfile.rb
+MOSYNCDIR=$WORKSPACE/MoSyncPackage ruby ./workfile.rb CONFIG=&quot;&quot;
+MOSYNCDIR=$WORKSPACE/MoSyncPackage ruby ./workfile.rb USE_NEWLIB=1
+MOSYNCDIR=$WORKSPACE/MoSyncPackage ruby ./workfile.rb CONFIG=&quot;&quot; USE_NEWLIB=1</command>
+    </hudson.tasks.Shell>
+    <hudson.plugins.ruby.Ruby plugin="ruby@1.2">
+      <command>require &apos;fileutils&apos;
+
+@sourceDir = ENV[&quot;WORKSPACE&quot;] + &quot;/mosync-trunk&quot;
+@mosyncDir =ENV[&quot;WORKSPACE&quot;] + &quot;/MoSyncPackage&quot;
+ENV[&quot;MOSYNCDIR&quot;] = @mosyncDir
+curDir = FileUtils.pwd
+
+def copyFiles(sourcePath, destPath)
+	puts &quot;Copying #{sourcePath} ----to---- #{destPath}&quot;
+	fileName = File.basename(sourcePath)
+	copyPath = File.dirname(sourcePath)
+	if fileName.include?(&quot;*&quot;)
+	d = Dir.new(copyPath)
+	tempFileList = d.entries
+	tempList = tempFileList.select { |item| item != &quot;.&quot; &amp;&amp; item != &quot;..&quot;}
+	absFileName = fileName.delete(&quot;*&quot;)
+	if (!absFileName.empty?)
+	tempList.delete_if { |item|  !item.include?(absFileName) }
+	end
+	else
+	tempList = [sourcePath]
+	end
+	tempList.each do |item|
+		if (fileName.include?(&quot;*&quot;))
+			FileUtils.cp_r(&quot;#{copyPath}/#{item}&quot;, destPath)
+		else
+			FileUtils.cp_r(&quot;#{item}&quot;, destPath)
+		end
+	end
+end
+
+if(File.exist?(&quot;#{@sourceDir}/libs/Wormhole/jslib/buildJS.rb&quot;))
+	FileUtils.cd &quot;#{@sourceDir}/libs/Wormhole/jslib/&quot;
+	%x(ruby buildJS.rb all)
+	FileUtils.cd curDir
+end
+FileUtils.cd(&quot;#{@sourceDir}/examples&quot;)
+
+subDirs = Array.new
+type = &quot;&quot;
+File.open(&quot;examples.list&quot;).each do |line|
+	if((!line.include?(&quot;#&quot;))&amp;&amp;(line.strip.start_with?(&quot;[&quot;))&amp;&amp;(line.strip.end_with?(&quot;]&quot;)))
+		type = line.strip[1..-2]
+	end
+	if((!line.include?(&quot;#&quot;))&amp;&amp;(!line.include?(&quot;[&quot;)))
+		if(line.include?(&quot;=&quot;))
+			lineSplit = line.split(&quot;=&quot;)[1].strip
+			if(File.exist?(&quot;#{type}/#{lineSplit}&quot;))
+				subDirs.push(type + File::SEPARATOR + lineSplit)
+			end
+		else
+			if(File.exist?(&quot;#{type}/#{line.strip}&quot;))
+				subDirs.push(type + File::SEPARATOR + line.strip)
+			end
+		end
+	end
+end
+exampleList = subDirs
+
+exampleList.each do |example|
+	if(example.include?(&quot;/&quot;))
+		puts &quot;copying example #{example}&quot;
+		if(!File.exist?(&quot;#{@mosyncDir}/examples/#{example.split(&quot;/&quot;)[0..-2].join(&quot;/&quot;)}&quot;))
+			puts &quot;example : #{@mosyncDir}/examples/#{example.split(&quot;/&quot;)[0..-2].join(&quot;/&quot;)}&quot;
+			FileUtils.mkdir(&quot;#{@mosyncDir}/examples/#{example.split(&quot;/&quot;)[0..-2].join(&quot;/&quot;)}&quot;)
+		end
+		puts &quot;#{example} ---&gt; #{@mosyncDir}/examples/#{example}&quot;
+		copyFiles(&quot;#{example}&quot;, &quot;#{@mosyncDir}/examples/#{example}&quot;)
+	else
+		copyFiles(example, &quot;#{@mosyncDir}/examples/#{example}&quot;)
+	end
+end
+copyFiles(&quot;#{@sourceDir}/examples/examples.list&quot;, &quot;#{@mosyncDir}/examples/&quot;)
+copyFiles(&quot;#{@sourceDir}/examples/*.rb&quot;, &quot;#{@mosyncDir}/examples/&quot;)
+
+copyFiles(&quot;#{@sourceDir}/templates&quot;, &quot;#{@mosyncDir}/templates&quot;)
+FileUtils.cd curDir</command>
+    </hudson.plugins.ruby.Ruby>
+    <hudson.tasks.Shell>
+      <command>cd MoSyncPackage
+unzip ../../dynlib_mosync_mac.zip
+
+cd ..
+
+cp -r /usr/bin/zip MoSyncPackage/bin
+cp -r /sw/bin/unzip MoSyncPackage/bin
+cp -r /usr/bin/c++filt MoSyncPackage/bin
+cp -r /opt/local/bin/openssl MoSyncPackage/bin
+cp -r /opt/local/bin/convert MoSyncPackage/bin/ImageMagick
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin/openssl.cnf MoSyncPackage/bin
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin/unifont-5.1.20080907.ttf MoSyncPackage/bin
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/BMFont MoSyncPackage/bin/BMFont
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/ImageMagick MoSyncPackage/bin/ImageMagick
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/*.dll MoSyncPackage/bin
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/updater* MoSyncPackage/bin
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/lcab MoSyncPackage/bin
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/pcab.pl MoSyncPackage/bin
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/javame MoSyncPackage/bin
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/iphoneos/iphonesim MoSyncPackage/bin
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/iphoneos/iphonesim42 MoSyncPackage/bin
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/pcab.conf.template MoSyncPackage/bin
+cp -r mosync-trunk/runtimes/java/platforms/android/default.icon MoSyncPackage/etc || cp -r mosync-trunk/runtimes/java/platforms/androidJNI/default.icon MoSyncPackage/etc
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/ImageMagick/* MoSyncPackage/bin/ImageMagick
+cp -r mosync-trunk/tools/idl2/output/asm_config.lst MoSyncPackage/bin
+cp -r mosync-trunk/build/release/e32hack MoSyncPackage/bin
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/android MoSyncPackage/bin/android
+cp -r mosync-trunk/runtimes/java/platforms/android/mosync.keystore MoSyncPackage/etc || cp -r mosync-trunk/runtimes/java/platforms/androidJNI/mosync.keystore MoSyncPackage/etc
+cp -r mosync-trunk/runtimes/java/platforms/android/AndroidProject/res/drawable/* MoSyncPackage/etc || cp -r mosync-trunk/runtimes/java/platforms/androidJNI/AndroidProject/res/drawable/* MoSyncPackage/etc
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/bin/Batik MoSyncPackage/bin
+cp -r mosync-trunk/rules MoSyncPackage/</command>
+    </hudson.tasks.Shell>
+    <hudson.plugins.ruby.Ruby plugin="ruby@1.2">
+      <command>require &apos;fileutils&apos;
+
+class DynLibConv
+	def initialize
+	end
+
+	def run(cur, new, fileList)
+		files = check_files(fileList)
+		logs = change_name(fileList, cur, new)
+		return logs
+	end
+
+	##
+	# Changes the dylib paths of the given files.
+	#
+	# files A list of existing files.
+	# name A name to change.
+	# new_name The new_name to replace it with.
+	#
+	def change_name(files, name, new_name)
+		logs = Array.new
+		files.each do |file|
+			logs.push(&quot;checking file: #{file}&quot;)
+
+			paths = run_otool( file )
+
+			logs =  change_lib_paths(file, paths, name, new_name, logs)
+		end
+		return logs
+	end
+
+	##
+	# Gets the dylib information from the file and returns it.
+	#
+	def run_otool(file)
+		clean_lines = Array.new
+		IO::popen(&quot;otool -L #{file}&quot;  ) do |io|
+			while !io.eof?
+				line = io.gets( )
+				stripped_line = line.strip
+				path_part = line.split(&quot; &quot;)[0]
+				clean_lines.push(path_part.strip)
+			end
+		end
+
+		return clean_lines
+	end
+
+	###
+	## Changes the lib path for the given paths, by replaces
+	## name in the paths with new_name.
+	##
+	## file The binary or dylib to change
+	## paths A set of dylib paths included in the
+	## name String to replace in the path
+	## new_name New string
+	##
+	def change_lib_paths(file, paths, name, new_name, logs)
+#		logs = Array.new
+		paths.each do |path|
+			if path.strip.include?(name.strip)
+				logs.push(&quot;changing the paths for #{file} from #{name} to #{new_name}\n&quot;)
+				new_path = path.gsub(name.strip, new_name.strip)
+				logs.push(&quot;running install_name_tool -change #{path} #{new_path} #{file}\n\n&quot;)
+				system(&quot;install_name_tool -change #{path} #{new_path} #{file}&quot;)
+				# Wait for process to end
+
+			end
+		end
+		return logs
+	end
+
+	###
+	## Ensures that the given files exist, prints
+	## an error message if they don&apos;t. The existing
+	## files is returned in a list.
+	##
+	## files - A list of files
+	def check_files(files)
+		good_files = Array.new
+		files.each do |file|
+			good_files.push( file )
+		end
+		return good_files
+	end
+	#end of converter class
+end
+
+@mosyncDir = ENV[&quot;WORKSPACE&quot;] + &quot;/MoSyncPackage&quot;
+
+system(&quot;chmod -R +w #{@mosyncDir}/bin/*&quot;)
+
+fileName = File.basename(&quot;#{@mosyncDir}/bin/*.dylib&quot;)
+copyPath = File.dirname(&quot;#{@mosyncDir}/bin/*.dylib&quot;)
+if fileName.include?(&quot;*&quot;)
+	d = Dir.new(copyPath)
+	tempFileList = d.entries
+	tempList = tempFileList.select { |item| item != &quot;.&quot; &amp;&amp; item != &quot;..&quot;}
+	absFileName = fileName.delete(&quot;*&quot;)
+	if (!absFileName.empty?)
+		tempList.delete_if { |item|  !item.include?(absFileName) }
+	end
+end
+dynLibList = Array.new
+tempList.each do |item|
+	dynLibList.push(&quot;#{copyPath}/#{item}&quot;)
+end
+
+DynLibConv.new.run(&quot;/sw/lib&quot;,&quot;@loader_path&quot;, dynLibList)
+DynLibConv.new.run(&quot;/opt/local/lib&quot;,&quot;@loader_path&quot;, dynLibList)
+DynLibConv.new.run(&quot;/sw/lib&quot;, &quot;@loader_path&quot;, &quot;#{@mosyncDir}/bin/MoRE&quot;)
+DynLibConv.new.run(&quot;/opt/local/lib&quot;, &quot;@loader_path&quot;, &quot;#{@mosyncDir}/bin/MoRE&quot;)
+DynLibConv.new.run(&quot;/sw/lib&quot;, &quot;@loader_path&quot;, &quot;#{@mosyncDir}/bin/mdb&quot;)
+DynLibConv.new.run(&quot;/opt/local/lib &quot;, &quot;@loader_path&quot;, &quot;#{@mosyncDir}/bin/mdb&quot;)
+DynLibConv.new.run(&quot;/sw/lib &quot;, &quot;@loader_path&quot;, &quot;#{@mosyncDir}/bin/openssl&quot;)
+DynLibConv.new.run(&quot;/opt/local/lib &quot;, &quot;@loader_path&quot;, &quot;#{@mosyncDir}/bin/openssl&quot;)
+DynLibConv.new.run(&quot;/opt/local/lib &quot;, &quot;@loader_path&quot;, &quot;#{@mosyncDir}/bin/makesis-4&quot;)
+DynLibConv.new.run(&quot;/opt/local/lib &quot;, &quot;@loader_path&quot;, &quot;#{@mosyncDir}/bin/signsis-4&quot;)</command>
+    </hudson.plugins.ruby.Ruby>
+    <hudson.tasks.Shell>
+      <command>cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_docs/* MoSyncPackage/docs/
+cp -r mosync-trunk/libs/Doxyfile MoSyncPackage/include/
+cd MoSyncPackage/include
+
+MOSYNC_DOXYGEN_OUTPUT_DIR=$WORKSPACE/MoSyncPackage/docs doxygen;
+rm Doxyfile
+cd $WORKSPACE
+cp -r MoSyncPackage/docs/html MoSyncPackage/eclipse/plugins/com.mobilesorcery.sdk.help_1.0.0/docs/
+cd mosync-trunk/tools/doxy2cdt
+MOSYNC_DOXYGEN_OUTPUT_DIR=$WORKSPACE/MoSyncPackage/docs ruby -v main.rb -b com.mobilesorcery.sdk.help/docs/html/ $WORKSPACE/MoSyncPackage/docs/xml/index.xml $WORKSPACE/MoSyncPackage/eclipse/plugins/com.mobilesorcery.sdk.help_1.0.0/docs/apireference.xml
+cd $WORKSPACE
+rm -rf MoSyncPackage/docs/xml
+chmod +x mosync-trunk/build/release/PanicDoc
+mosync-trunk/build/release/PanicDoc -props &gt;MoSyncPackage/eclipse/paniccodes.properties</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>cd $WORKSPACE
+
+cd MoSyncPackage
+zip -r9 $WORKSPACE/MacLibs.zip *</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>MacLibs.zip</artifacts>
+      <latestOnly>true</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.Fingerprinter>
+      <targets></targets>
+      <recordBuildArtifacts>true</recordBuildArtifacts>
+    </hudson.tasks.Fingerprinter>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+      <deleteDirs>false</deleteDirs>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>

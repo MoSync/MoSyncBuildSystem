@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Builds any runtimes that can be built on Linux</description>
+  <logRotator>
+    <daysToKeep>7</daysToKeep>
+    <numToKeep>30</numToKeep>
+    <artifactDaysToKeep>7</artifactDaysToKeep>
+    <artifactNumToKeep>30</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>linux</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.copyartifact.CopyArtifact>
+      <projectName>Prepare_MoSync_Source_Tarball</projectName>
+      <filter>MoSyncSrc.tar.bz2</filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
+        <id>lastBuild</id>
+      </selector>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.tasks.Shell>
+      <command>mkdir mosync-trunk
+bzip2 -d MoSyncSrc.tar.bz2
+cd mosync-trunk
+tar -x -f ../MoSyncSrc.tar</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>##cd %WORKSPACE%\mosync-trunk
+##ruby workfile.rb base CONFIG=
+
+cd $WORKSPACE/mosync-trunk/intlibs/idl-common
+ruby workfile.rb CONFIG=
+
+cd $WORKSPACE/mosync-trunk/intlibs/filelist
+ruby workfile.rb CONFIG=
+
+cd $WORKSPACE/mosync-trunk/tools/idl2
+ruby workfile.rb CONFIG=
+
+cd $WORKSPACE/mosync-trunk/tools/idl2
+MOSYNCDIR=$WORKSPACE/mosync-trunk build/release/idl2
+
+cd $WORKSPACE/mosync-trunk/intlibs/bluetooth
+ruby workfile.rb CONFIG=</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>cd $WORKSPACE/mosync-trunk/tools/ProfileConverter
+fromdos profiles.sql
+cd $WORKSPACE/mosync-trunk/tools/ConcurrentBuild
+ruby ConcurrentBuild.rb $WORKSPACE/mosync-trunk $WORKSPACE/mosync-trunk android moblin javame</command>
+    </hudson.tasks.Shell>
+    <hudson.tasks.Shell>
+      <command>cd $WORKSPACE
+
+cd mosync-trunk
+zip -r9 $WORKSPACE/LinuxRuntimes.zip profiles</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>LinuxRuntimes.zip</artifacts>
+      <latestOnly>true</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.Fingerprinter>
+      <targets></targets>
+      <recordBuildArtifacts>true</recordBuildArtifacts>
+    </hudson.tasks.Fingerprinter>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup>
+      <deleteDirs>false</deleteDirs>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>

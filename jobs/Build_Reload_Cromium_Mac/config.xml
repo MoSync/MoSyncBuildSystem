@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Builds the Reload Mac package (with Chromium)</description>
+  <logRotator>
+    <daysToKeep>7</daysToKeep>
+    <numToKeep>30</numToKeep>
+    <artifactDaysToKeep>7</artifactDaysToKeep>
+    <artifactNumToKeep>30</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>ios</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+      <projectName>Build_Reload_Clients</projectName>
+      <filter></filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
+        <id>lastBuild</id>
+      </selector>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+      <projectName>Prepare_Reload_Source_Tarball</projectName>
+      <filter>ReloadSrc.tar.bz2</filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.tasks.Shell>
+      <command>mkdir Reload-trunk
+bzip2 -d ReloadSrc.tar.bz2
+cd Reload-trunk
+tar -x -f ../ReloadSrc.tar
+
+unzip -o $WORKSPACE/\*.zip
+
+</command>
+    </hudson.tasks.Shell>
+    <hudson.plugins.ruby.Ruby plugin="ruby@1.2">
+      <command>require &quot;fileutils&quot;
+
+version = &quot;1.0&quot;
+time_stamp = Time.now.strftime(&quot;%Y%m%d-%H%M&quot;)[2..-1]
+
+def sh(command)
+  if(!system(command))
+    raise(&quot;failed to run #{command}&quot;)
+    exist!(1)
+  end
+end
+
+FileUtils.cd &quot;Reload-trunk&quot;
+
+FileUtils.mkdir &quot;Build&quot;
+
+main_dir = FileUtils.pwd
+
+sh &quot;cp -r ReloadServer/* ReloadLauncher/Mac/cefclient/res/ReloadServer/&quot;
+
+FileUtils.cd &quot;ReloadLauncher/Mac&quot;
+
+#Remove the previous package and foce xcode to build a new one
+if(File.exist?(&quot;xcodebuild/Release/Reload.app&quot;))
+  FileUtils.rm_rf &quot;xcodebuild/Release/Reload.app&quot;
+end
+
+#Set the correct path to xcodebuild
+xcodebuild = &quot;/Developer/usr/bin/xcodebuild&quot;;
+if(!File.exist?(xcodebuild))
+  xcodebuild = &quot;/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild&quot;
+end
+
+# build Reload Mac Luancher
+sh &quot;#{xcodebuild} -configuration Release -project Reload.xcodeproj&quot;
+FileUtils.cd main_dir
+
+
+sh &quot;hdiutil attach ReloadAppTemplates/MoSync_Reload_BETA_Template.dmg&quot;
+
+FileUtils.rm_rf &quot;/Volumes/MoSync Reload (BETA)/Android Client&quot;
+FileUtils.rm_rf &quot;/Volumes/MoSync Reload (BETA)/iOS Client&quot;
+FileUtils.rm_rf &quot;/Volumes/MoSync Reload (BETA)/WP7 Client&quot;
+FileUtils.rm_rf &quot;/Volumes/MoSync Reload (BETA)/Reload.app&quot;
+FileUtils.cp_r &quot;ReloadLauncher/Mac/xcodebuild/Release/Reload.app&quot;, &quot;/Volumes/MoSync Reload (BETA)/&quot;
+
+
+
+puts &quot;Copying Clients&quot;
+FileUtils.cp_r &quot;Clients/Android&quot;, &quot;/Volumes/MoSync Reload (BETA)/Android Client&quot;
+FileUtils.cp_r &quot;Clients/iOS&quot;, &quot;/Volumes/MoSync Reload (BETA)/iOS Client&quot;
+FileUtils.cp_r &quot;Clients/WindowsPhone&quot;, &quot;/Volumes/MoSync Reload (BETA)/WP7 Client&quot;
+
+
+puts &quot;Copying Readme&quot;
+FileUtils.cp_r &quot;ReadMe.txt&quot;, &quot;/Volumes/MoSync Reload (BETA)/&quot;
+
+FileUtils.cp_r &quot;Licenses&quot;, &quot;/Volumes/MoSync Reload (BETA)/&quot;
+
+
+puts &quot;creating final Mac Package&quot;
+sh &quot;hdiutil detach -force /Volumes/MoSync\\ Reload\\ \\(BETA\\)/&quot;
+sh &quot;hdiutil convert  ReloadAppTemplates/MoSync_Reload_BETA_Template.dmg -format UDZO -imagekey zlib-level=9 -o  Build/MoSync_Reload_BETA_OSX_#{time_stamp}.dmg&quot;</command>
+    </hudson.plugins.ruby.Ruby>
+    <hudson.tasks.Shell>
+      <command>mv Reload-trunk/Build/*.dmg .</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>*.dmg</artifacts>
+      <latestOnly>true</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.Fingerprinter>
+      <targets></targets>
+      <recordBuildArtifacts>true</recordBuildArtifacts>
+    </hudson.tasks.Fingerprinter>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+      <deleteDirs>false</deleteDirs>
+    </hudson.plugins.ws__cleanup.PreBuildCleanup>
+  </buildWrappers>
+</project>
