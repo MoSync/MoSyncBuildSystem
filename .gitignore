@@ -9,6 +9,7 @@ identity.key
 secret.key
 secret.key.*
 jenkins.war
+workspace
 
 /fingerprints
 /logs
@@ -28,3 +29,4 @@ jenkins.war
 /jenkins.exe
 /jenkins.exe.*
 /secrets
+/startJenkins
