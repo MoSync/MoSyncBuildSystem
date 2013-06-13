@@ -11,7 +11,7 @@
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.scm.NullSCM"/>
-  <assignedNode>winmosync</assignedNode>
+  <assignedNode>windows</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -19,7 +19,7 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Prepare_MoSync_Source_Tarball</projectName>
       <filter>MoSyncSrc.tar.bz2</filter>
       <target></target>
@@ -29,8 +29,8 @@
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.tasks.BatchFile>
       <command>mkdir mosync-trunk
-7z x MoSyncSrc.tar.bz2
-7z x MoSyncSrc.tar -omosync-trunk
+set PATH=%MSYS_BIN%;%PATH%
+tar --directory=mosync-trunk -xjf MoSyncSrc.tar.bz2
 
 mkdir mosync-trunk\include
 mkdir mosync-trunk\lib
@@ -60,7 +60,11 @@ mkdir MoSyncPackage\eclipse\plugins\com.mobilesorcery.sdk.help_1.0.0
 mkdir MoSyncPackage\eclipse\plugins\com.mobilesorcery.sdk.help_1.0.0\docs</command>
     </hudson.tasks.BatchFile>
     <hudson.tasks.BatchFile>
-      <command>cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin/* MoSyncPackage/bin/
+      <command>cp /mingw/bin/libstdc++-6.dll MoSyncPackage/bin/
+cp /mingw/bin/libgcc_s_dw2-1.dll MoSyncPackage/bin/
+cp /mingw/bin/libz-1.dll MoSyncPackage/bin/
+
+cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin/* MoSyncPackage/bin/
 cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mapip_bin/* MoSyncPackage/mapip/bin/
 cp -r mosync-trunk/skins/* MoSyncPackage/skins/
 cp -r mosync-trunk/MoSyncRules.rules MoSyncPackage/
@@ -84,7 +88,13 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 ruby workfile.rb USE_NEWLIB=
 if %errorlevel% neq 0 exit /b %errorlevel%
 ruby workfile.rb CONFIG= USE_NEWLIB=
-if %errorlevel% neq 0 exit /b %errorlevel%</command>
+if %errorlevel% neq 0 exit /b %errorlevel%
+
+cd %WORKSPACE%/mosync-trunk/libs
+if exist prepareMAStdNative.rb (ruby prepareMAStdNative.rb)
+if exist prepareMAStdNative.rb (if %errorlevel% neq 0 exit /b %errorlevel%)
+
+exit 0</command>
     </hudson.tasks.BatchFile>
     <hudson.plugins.ruby.Ruby plugin="ruby@1.2">
       <command>require &apos;fileutils&apos;

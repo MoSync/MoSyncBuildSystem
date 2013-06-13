@@ -11,7 +11,7 @@
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.scm.NullSCM"/>
-  <assignedNode>macPackaging</assignedNode>
+  <assignedNode>mac106</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -19,7 +19,7 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Prepare_MoSync_Source_Tarball</projectName>
       <filter>MoSyncSrc.tar.bz2</filter>
       <target></target>
@@ -29,21 +29,16 @@
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.tasks.Shell>
       <command>mkdir mosync-trunk
-bzip2 -d MoSyncSrc.tar.bz2
 cd mosync-trunk
-tar -x -f ../MoSyncSrc.tar</command>
+tar -xjf ../MoSyncSrc.tar.bz2
+exit 0
+</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>cd mosync-trunk
-
-find . -name &quot;*.js&quot; -print0 | xargs -0 dos2unix
-find . -name &quot;*.md&quot; -print0 | xargs -0 dos2unix
-find . -name &quot;*.pl&quot; -print0 | xargs -0 dos2unix
-find . -name &quot;*jodoc*&quot; -print0 | xargs -0 dos2unix
-
-cd libs/Wormhole/jslib
+      <command>cd mosync-trunk/libs/Wormhole/jslib
 chmod +x buildJSDocumentation.rb
-ruby buildJSDocumentation.rb</command>
+ruby buildJSDocumentation.rb
+</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
       <command>mkdir MoSyncPackage

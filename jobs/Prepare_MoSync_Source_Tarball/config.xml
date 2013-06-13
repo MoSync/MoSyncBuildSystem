@@ -196,17 +196,14 @@ end</command>
     </hudson.plugins.ruby.Ruby>
     <hudson.tasks.Shell>
       <command>cd MoSync-trunk
-tar -cf ../MoSyncSrc.tar --exclude=&quot;.git*&quot; *
+tar -cjf ../MoSyncSrc.tar.bz2 --exclude=&quot;.git*&quot; *
 cd ..
 cd Eclipse
-tar -cf ../EclipseSrc.tar --exclude=&quot;.git*&quot; *
+tar -cjf ../EclipseSrc.tar.bz2 --exclude=&quot;.git*&quot; *
 cd ..
 
-tar -cf MoSyncSrc-$TIMESTAMP.tar --exclude=&quot;.git*&quot; MoSync-trunk Eclipse
-
-bzip2 -z -9  MoSyncSrc.tar
-bzip2 -z -9  EclipseSrc.tar
-bzip2 -z -9  MoSyncSrc-$TIMESTAMP.tar</command>
+tar -cjf MoSyncSrc-$TIMESTAMP.tar.bz2 --exclude=&quot;.git*&quot; MoSync-trunk Eclipse
+</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

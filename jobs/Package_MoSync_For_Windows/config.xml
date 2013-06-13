@@ -29,13 +29,13 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Prepare_MoSync_Source_Tarball</projectName>
       <filter>MoSyncSrc.tar.bz2</filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Build_Windows_Runtimes</projectName>
       <filter></filter>
       <target></target>
@@ -44,7 +44,7 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Build_Libs_Tools_Examples_On_Windows</projectName>
       <filter></filter>
       <target></target>
@@ -53,7 +53,7 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Build_Eclipse</projectName>
       <filter>installer_splash.bmp, MoSync-win32.win32.x86-trimmed.zip</filter>
       <target></target>
@@ -62,7 +62,7 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Build_Linux_Runtimes</projectName>
       <filter></filter>
       <target></target>
@@ -71,7 +71,7 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Build_iOS_Runtime</projectName>
       <filter></filter>
       <target></target>
@@ -80,7 +80,7 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Build_WP7_Runtime</projectName>
       <filter></filter>
       <target></target>
@@ -89,7 +89,25 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
+      <projectName>Build_WP8_runtime</projectName>
+      <filter></filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
+        <id>lastBuild</id>
+      </selector>
+      <optional>true</optional>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
+      <projectName>Build_WP8_libs</projectName>
+      <filter></filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
+        <id>lastBuild</id>
+      </selector>
+      <optional>true</optional>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Build_VS2010_Libs_MoRE</projectName>
       <filter></filter>
       <target></target>
@@ -98,7 +116,7 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Build_HTML5_Documentation</projectName>
       <filter></filter>
       <target></target>
@@ -109,8 +127,8 @@
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.tasks.BatchFile>
       <command>mkdir mosync-trunk
-7z x MoSyncSrc.tar.bz2
-7z x MoSyncSrc.tar -omosync-trunk
+set PATH=%MSYS_BIN%;%PATH%
+tar --directory=mosync-trunk -xjf MoSyncSrc.tar.bz2
 
 mkdir MoSyncWinPackage
 7z x *.zip -oMoSyncWinPackage -aoa
@@ -147,7 +165,7 @@ mv MoSyncWinPackage/MoSyncSetup.exe MoSyncWindows-%TIMESTAMP%.exe</command>
     </hudson.tasks.Fingerprinter>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
       <deleteDirs>false</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
   </buildWrappers>

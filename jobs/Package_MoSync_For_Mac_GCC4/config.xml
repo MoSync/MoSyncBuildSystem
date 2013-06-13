@@ -22,44 +22,50 @@
           <description></description>
           <defaultValue>featured</defaultValue>
         </hudson.model.StringParameterDefinition>
+        <hudson.plugins.copyartifact.BuildSelectorParameter plugin="copyartifact@1.25">
+          <name>BUILD_SELECTOR_Build_GCC4_Eclipse</name>
+          <description></description>
+          <defaultSelector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+        </hudson.plugins.copyartifact.BuildSelectorParameter>
+        <hudson.plugins.copyartifact.BuildSelectorParameter plugin="copyartifact@1.25">
+          <name>BUILD_SELECTOR_Build_GCC4_iOS_Runtime</name>
+          <description></description>
+          <defaultSelector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+        </hudson.plugins.copyartifact.BuildSelectorParameter>
+        <hudson.plugins.copyartifact.BuildSelectorParameter plugin="copyartifact@1.25">
+          <name>BUILD_SELECTOR_MoSync_Mac</name>
+          <description></description>
+          <defaultSelector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+        </hudson.plugins.copyartifact.BuildSelectorParameter>
+        <hudson.plugins.copyartifact.BuildSelectorParameter plugin="copyartifact@1.25">
+          <name>BUILD_SELECTOR_Build_GCC4_WP7_Runtime</name>
+          <description></description>
+          <defaultSelector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+        </hudson.plugins.copyartifact.BuildSelectorParameter>
+        <hudson.plugins.copyartifact.BuildSelectorParameter plugin="copyartifact@1.25">
+          <name>BUILD_SELECTOR_Build_GCC4_xp_Runtimes</name>
+          <description></description>
+          <defaultSelector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+        </hudson.plugins.copyartifact.BuildSelectorParameter>
+        <hudson.plugins.copyartifact.BuildSelectorParameter plugin="copyartifact@1.25">
+          <name>BUILD_SELECTOR_Build_GCC4_Linux_Runtimes</name>
+          <description></description>
+          <defaultSelector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
+        </hudson.plugins.copyartifact.BuildSelectorParameter>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
   <scm class="hudson.scm.NullSCM"/>
   <assignedNode>mac106</assignedNode>
   <canRoam>false</canRoam>
-  <disabled>false</disabled>
+  <disabled>true</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Prepare_MoSync_Source_Tarball</projectName>
-      <filter>MoSyncSrc.tar.bz2</filter>
-      <target></target>
-      <selector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
-    </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_Windows_Runtimes</projectName>
-      <filter></filter>
-      <target></target>
-      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
-        <id>lastBuild</id>
-      </selector>
-      <optional>true</optional>
-    </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_Libs_Tools_Examples_MoRE_On_Mac</projectName>
-      <filter></filter>
-      <target></target>
-      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
-        <id>lastBuild</id>
-      </selector>
-      <optional>true</optional>
-    </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_Eclipse</projectName>
+      <projectName>Build_GCC4_Eclipse</projectName>
       <filter>installer_splash.bmp, MoSync-macosx.cocoa.x86_64-trimmed.zip</filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -68,46 +74,39 @@
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_Linux_Runtimes</projectName>
+      <projectName>Build_GCC4_iOS_Runtime</projectName>
       <filter></filter>
       <target></target>
-      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
-        <id>lastBuild</id>
+      <selector class="hudson.plugins.copyartifact.ParameterizedBuildSelector">
+        <parameterName>BUILD_SELECTOR_Build_GCC4_iOS_Runtime</parameterName>
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_iOS_Runtime</projectName>
+      <projectName>Build_GCC4_MoSync_Mac</projectName>
       <filter></filter>
       <target></target>
-      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
-        <id>lastBuild</id>
+      <selector class="hudson.plugins.copyartifact.ParameterizedBuildSelector">
+        <parameterName>BUILD_SELECTOR_MoSync_Mac</parameterName>
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_WP7_Runtime</projectName>
+      <projectName>Build_GCC4_WP7_Runtime</projectName>
       <filter></filter>
       <target></target>
-      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
-        <id>lastBuild</id>
+      <selector class="hudson.plugins.copyartifact.ParameterizedBuildSelector">
+        <parameterName>BUILD_SELECTOR_Build_GCC4_WP7_Runtime</parameterName>
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_WP8_runtime</projectName>
-      <filter>WP8Runtime.zip</filter>
+      <projectName>Build_GCC4_xp_Runtimes</projectName>
+      <filter></filter>
       <target></target>
-      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
-        <id>lastBuild</id>
+      <selector class="hudson.plugins.copyartifact.ParameterizedBuildSelector">
+        <parameterName>BUILD_SELECTOR_Build_GCC4_xp_Runtimes</parameterName>
       </selector>
-      <optional>true</optional>
-    </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_WP8_libs</projectName>
-      <filter>WP8Libs.zip</filter>
-      <target></target>
-      <selector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
@@ -115,24 +114,44 @@
       <filter></filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
-        <id>lastBuild</id>
+        <id>lastSuccessfulBuild</id>
+      </selector>
+      <optional>true</optional>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
+      <projectName>Build_GCC4_Linux_Runtimes</projectName>
+      <filter></filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.ParameterizedBuildSelector">
+        <parameterName>BUILD_SELECTOR_Build_GCC4_Linux_Runtimes</parameterName>
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.tasks.Shell>
-      <command>mkdir mosync-trunk
-cd mosync-trunk
-tar -xjf ../MoSyncSrc.tar.bz2
+      <command>#mkdir mosync-trunk
+#cd mosync-trunk
+#tar -xjf ../MoSyncSrc.tar.bz2
 
 cd $WORKSPACE
 
 unzip -o $WORKSPACE/../macPackResources.zip
 
-mkdir MoSync-pkg/$BUILD_MODE
+#mkdir MoSync-pkg/$BUILD_MODE
 
-cd MoSync-pkg/$BUILD_MODE
+#cd MoSync-pkg/$BUILD_MODE
+
+mv MoSync-macosx.cocoa.x86_64-trimmed.zip MoSync-macosx.cocoa.x86_64-trimmed
+
+cd MoSync-pkg
 
 unzip -o $WORKSPACE/\*.zip
+
+mv MoSync $BUILD_MODE
+
+mv $WORKSPACE/MoSync-macosx.cocoa.x86_64-trimmed $WORKSPACE/MoSync-macosx.cocoa.x86_64-trimmed.zip
+
+cd $BUILD_MODE
+unzip -o $WORKSPACE/MoSync-macosx.cocoa.x86_64-trimmed.zip
 
 mkdir eclipse || echo &quot;eclipse already exists&quot;
 cp -R mosync/* eclipse/
@@ -140,8 +159,8 @@ rm -r mosync
 
 cd $WORKSPACE
 
-cp mosync-trunk/buildInfo.txt MoSync-pkg/$BUILD_MODE/bin
-mv mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_docs/licenses/mosync-license.txt $WORKSPACE/license.txt
+#cp mosync-trunk/buildInfo.txt MoSync-pkg/$BUILD_MODE/bin
+#mv mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_docs/licenses/mosync-license.txt $WORKSPACE/license.txt
 
 chmod -R +x MoSync-pkg/$BUILD_MODE/bin
 chmod -R +x MoSync-pkg/$BUILD_MODE/libexec

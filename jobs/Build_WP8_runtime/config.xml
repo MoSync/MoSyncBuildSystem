@@ -11,7 +11,7 @@
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.scm.NullSCM"/>
-  <assignedNode>wp7</assignedNode>
+  <assignedNode>win8</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -27,17 +27,32 @@
         <id>lastBuild</id>
       </selector>
     </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
+      <projectName>Build_Libs_Tools_Examples_On_Windows</projectName>
+      <filter>WindowsLibs.zip</filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
+        <id>lastBuild</id>
+      </selector>
+    </hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
+      <projectName>Build_WP8_libs</projectName>
+      <filter>WP8Libs.zip</filter>
+      <target></target>
+      <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
+        <id>lastBuild</id>
+      </selector>
+    </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.tasks.BatchFile>
       <command>mkdir mosync-trunk
 set PATH=%MSYS_BIN%;%PATH%
 tar --directory=mosync-trunk -xjf MoSyncSrc.tar.bz2
-exit 0
-</command>
+unzip WP8Libs.zip -d mosync-trunk
+unzip WindowsLibs.zip -d mosync-trunk
+exit 0</command>
     </hudson.tasks.BatchFile>
     <hudson.tasks.BatchFile>
       <command>set MOSYNCDIR=%WORKSPACE%/mosync-trunk
-##cd %WORKSPACE%\mosync-trunk
-##ruby workfile.rb base CONFIG=
 
 cd %WORKSPACE%/mosync-trunk/intlibs/idl-common
 ruby workfile.rb CONFIG=
@@ -60,7 +75,12 @@ ruby workfile.rb CONFIG=
 if %errorlevel% neq 0 exit /b %errorlevel%</command>
     </hudson.tasks.BatchFile>
     <hudson.tasks.BatchFile>
-      <command>call &quot;%VS100COMNTOOLS%vsvars32.bat&quot;
+      <command>if not exist mosync-trunk/runtimes/csharp/windowsphone/buildLibraries_WP8.rb (exit 0)
+
+set MOSYNCDIR=%WORKSPACE%/mosync-trunk
+
+cd $WORKSPACE/mosync-trunk/libs
+ruby prepareMAStdNative.rb
 
 set PATH=C:/MinGW/bin;C:/msys/1.0/bin;%WORKSPACE%/mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin;%PATH%
 cd mosync-trunk
@@ -72,27 +92,26 @@ mkdir winphone
 cd winphone
 mkdir 1
 cd 1
-mkdir template
-mkdir mosyncExtensionTemplate
+mkdir template_WP8
 cd %WORKSPACE%/mosync-trunk/runtimes/csharp/windowsphone
 
-ruby buildLibraries.rb
+ruby buildLibraries_WP8.rb
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-Xcopy /E /I /Y template %WORKSPACE%\mosync-trunk\profiles\runtimes\winphone\1\template\
-Xcopy /E /I /Y mosync\mosyncExtensionTemplate %WORKSPACE%\mosync-trunk\profiles\runtimes\winphone\1\mosyncExtensionTemplate\</command>
+Xcopy /E /I /Y template_WP8 %WORKSPACE%\mosync-trunk\profiles\runtimes\winphone\1\template_WP8</command>
     </hudson.tasks.BatchFile>
     <hudson.tasks.BatchFile>
       <command>cd %WORKSPACE%
 
+mkdir profiles
 cd mosync-trunk
-7z a -tzip -mx9 %WORKSPACE%/WP7Runtime.zip profiles</command>
+7z a -tzip -mx9 %WORKSPACE%/WP8Runtime.zip profiles</command>
     </hudson.tasks.BatchFile>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>WP7Runtime.zip</artifacts>
-      <latestOnly>true</latestOnly>
+      <artifacts>WP8Runtime.zip</artifacts>
+      <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.Fingerprinter>
       <targets></targets>

@@ -19,7 +19,7 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Prepare_MoSync_Source_Tarball</projectName>
       <filter>MoSyncSrc.tar.bz2</filter>
       <target></target>
@@ -29,9 +29,8 @@
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.tasks.Shell>
       <command>mkdir mosync-trunk
-bzip2 -d MoSyncSrc.tar.bz2
 cd mosync-trunk
-tar -x -f ../MoSyncSrc.tar</command>
+tar -xjf ../MoSyncSrc.tar.bz2</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
       <command>##cd %WORKSPACE%\mosync-trunk
@@ -53,7 +52,11 @@ cd $WORKSPACE/mosync-trunk/intlibs/bluetooth
 ruby workfile.rb CONFIG=</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
-      <command>mkdir MoSyncPackage
+      <command>cd $WORKSPACE/mosync-trunk/libs
+MOSYNCDIR=$WORKSPACE/mosync-trunk/ ruby prepareMAStdNative.rb || echo &quot;no prepareMAStdNative.rb script&quot;
+cd $WORKSPACE
+
+mkdir MoSyncPackage
 mkdir MoSyncPackage/profiles
 mkdir MoSyncPackage/profiles/runtimes
 mkdir MoSyncPackage/profiles/runtimes/iphoneos
@@ -68,7 +71,7 @@ MOSYNCDIR=$WORKSPACE/MoSyncPackage ruby buildLibraries.rb</command>
       <command>cd $WORKSPACE
 
 cd MoSyncPackage
-zip -r9 $WORKSPACE/iOSRuntimes.zip profiles</command>
+zip -r9 $WORKSPACE/iOSRuntimes.zip profiles lib</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

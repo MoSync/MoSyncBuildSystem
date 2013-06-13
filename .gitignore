@@ -26,4 +26,5 @@ jenkins.war
 /jenkins.xml
 /jenkins.*.xml
 /jenkins.exe
+/jenkins.exe.*
 /secrets

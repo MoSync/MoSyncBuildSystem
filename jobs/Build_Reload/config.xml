@@ -22,7 +22,7 @@
           <description>The branch to check out</description>
           <defaultValue>master</defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.plugins.copyartifact.BuildSelectorParameter plugin="copyartifact@1.22">
+        <hudson.plugins.copyartifact.BuildSelectorParameter plugin="copyartifact@1.25">
           <name>MOSYNC_PACKAGE</name>
           <description>The SDK build that will be used to build Reload</description>
           <defaultSelector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
@@ -30,7 +30,7 @@
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.git.GitSCM" plugin="git@1.1.23">
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@1.1.26">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
@@ -67,7 +67,7 @@
     <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
-  <assignedNode>ios</assignedNode>
+  <assignedNode>mac106</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -75,7 +75,7 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Build_MoSync_SDK</projectName>
       <filter>*.dmg</filter>
       <target></target>

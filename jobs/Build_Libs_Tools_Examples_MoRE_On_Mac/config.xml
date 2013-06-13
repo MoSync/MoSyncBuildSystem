@@ -11,7 +11,7 @@
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.scm.NullSCM"/>
-  <assignedNode>macPackaging</assignedNode>
+  <assignedNode>mac106</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -19,7 +19,7 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Prepare_MoSync_Source_Tarball</projectName>
       <filter>MoSyncSrc.tar.bz2</filter>
       <target></target>
@@ -29,20 +29,14 @@
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.tasks.Shell>
       <command>mkdir mosync-trunk
-bzip2 -d MoSyncSrc.tar.bz2
 cd mosync-trunk
-tar -x -f ../MoSyncSrc.tar
-
-find . -name &quot;*.sh&quot; -print0 | xargs -0 dos2unix
-#find . -name &quot;*.h&quot; -print0 | xargs -0 dos2unix
-#find . -name &quot;*.cpp&quot; -print0 | xargs -0 dos2unix
-find . -name &quot;*.rb&quot; -print0 | xargs -0 dos2unix
-find . -name &quot;*.idl&quot; -print0 | xargs -0 dos2unix</command>
+tar -xjf ../MoSyncSrc.tar.bz2
+exit 0
+</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
       <command>mkdir MoSyncPackage
 mkdir MoSyncPackage/bin
-mkdir MoSyncPackage/rules
 mkdir MoSyncPackage/bin/freetype219
 mkdir MoSyncPackage/bin/freetype219/lib
 mkdir MoSyncPackage/etc
@@ -64,7 +58,6 @@ cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/libexec
 cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/xgcc MoSyncPackage/bin/
 cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/osx_bin/cpp MoSyncPackage/bin/
 cp -r mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin/version.dat MoSyncPackage/bin/
-cp -r mosync-trunk/rules/* MoSyncPackage/rules/
 
 chmod -R +x MoSyncPackage/bin/*
 chmod -R +x MoSyncPackage/libexec/*</command>
@@ -74,7 +67,10 @@ chmod -R +x MoSyncPackage/libexec/*</command>
 MOSYNCDIR=$WORKSPACE/MoSyncPackage ruby ./workfile.rb
 MOSYNCDIR=$WORKSPACE/MoSyncPackage ruby ./workfile.rb CONFIG=&quot;&quot;
 MOSYNCDIR=$WORKSPACE/MoSyncPackage ruby ./workfile.rb USE_NEWLIB=1
-MOSYNCDIR=$WORKSPACE/MoSyncPackage ruby ./workfile.rb CONFIG=&quot;&quot; USE_NEWLIB=1</command>
+MOSYNCDIR=$WORKSPACE/MoSyncPackage ruby ./workfile.rb CONFIG=&quot;&quot; USE_NEWLIB=1
+
+cd $WORKSPACE/mosync-trunk/libs
+MOSYNCDIR=$WORKSPACE/MoSyncPackage/ ruby prepareMAStdNative.rb || echo &quot;no prepareMAStdNative.rb script&quot;</command>
     </hudson.tasks.Shell>
     <hudson.plugins.ruby.Ruby plugin="ruby@1.2">
       <command>require &apos;fileutils&apos;

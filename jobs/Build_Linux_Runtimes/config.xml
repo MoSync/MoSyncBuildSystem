@@ -19,7 +19,7 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Prepare_MoSync_Source_Tarball</projectName>
       <filter>MoSyncSrc.tar.bz2</filter>
       <target></target>
@@ -29,9 +29,7 @@
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.tasks.Shell>
       <command>mkdir mosync-trunk
-bzip2 -d MoSyncSrc.tar.bz2
-cd mosync-trunk
-tar -x -f ../MoSyncSrc.tar</command>
+tar --directory=mosync-trunk -xjf MoSyncSrc.tar.bz2</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
       <command>##cd %WORKSPACE%\mosync-trunk
@@ -56,13 +54,32 @@ ruby workfile.rb CONFIG=</command>
       <command>cd $WORKSPACE/mosync-trunk/tools/ProfileConverter
 fromdos profiles.sql
 cd $WORKSPACE/mosync-trunk/tools/ConcurrentBuild
-ruby ConcurrentBuild.rb $WORKSPACE/mosync-trunk $WORKSPACE/mosync-trunk android moblin javame</command>
+cp $WORKSPACE_ROOT/Settings.rb $WORKSPACE/mosync-trunk/tools/RuntimeBuilder/Settings.rb
+ruby ConcurrentBuild.rb $WORKSPACE/mosync-trunk $WORKSPACE/mosync-trunk android moblin javame
+
+cd $WORKSPACE/mosync-trunk/libs
+MOSYNCDIR=$WORKSPACE/mosync-trunk/ ruby prepareMAStdNative.rb || echo &quot;no prepareMAStdNative.rb script&quot;
+
+cd $WORKSPACE/mosync-trunk/intlibs/profiledb
+MOSYNCDIR=$WORKSPACE/mosync-trunk/ ruby workfile.rb CONFIG=&quot;&quot; || echo &quot;could not build profiledb intlib&quot;
+
+cd $WORKSPACE/mosync-trunk/intlibs/mustache || echo &quot;no mustache in this repo&quot;
+MOSYNCDIR=$WORKSPACE/mosync-trunk/ ruby workfile.rb CONFIG=&quot;&quot; || echo &quot;could not build profiledb intlib&quot;
+
+cd $WORKSPACE/mosync-trunk/tools/profiledb
+MOSYNCDIR=$WORKSPACE/mosync-trunk/ ruby workfile.rb CONFIG=&quot;&quot; || echo &quot;could not build profiledb&quot;
+
+cd $WORKSPACE/mosync-trunk/tools/nbuild || echo &quot;no nbuild in this repo&quot;
+MOSYNCDIR=$WORKSPACE/mosync-trunk/ ruby workfile.rb CONFIG=&quot;&quot;|| echo &quot;could not build nbuild&quot;
+
+cd $WORKSPACE/mosync-trunk/runtimes/java/platforms/androidJNI
+MOSYNCDIR=$WORKSPACE/mosync-trunk/ ruby buildLibs.rb @ || echo &quot;no buildLibs.rb file in this repo&quot;</command>
     </hudson.tasks.Shell>
     <hudson.tasks.Shell>
       <command>cd $WORKSPACE
 
 cd mosync-trunk
-zip -r9 $WORKSPACE/LinuxRuntimes.zip profiles</command>
+zip -r9 $WORKSPACE/LinuxRuntimes.zip profiles lib</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
@@ -76,7 +93,7 @@ zip -r9 $WORKSPACE/LinuxRuntimes.zip profiles</command>
     </hudson.tasks.Fingerprinter>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
       <deleteDirs>false</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
   </buildWrappers>

@@ -11,7 +11,7 @@
   <keepDependencies>false</keepDependencies>
   <properties/>
   <scm class="hudson.scm.NullSCM"/>
-  <assignedNode>windows</assignedNode>
+  <assignedNode>windows_xp</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -19,7 +19,7 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Prepare_MoSync_Source_Tarball</projectName>
       <filter>MoSyncSrc.tar.bz2</filter>
       <target></target>
@@ -29,8 +29,9 @@
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.tasks.BatchFile>
       <command>mkdir mosync-trunk
-7z x MoSyncSrc.tar.bz2
-7z x MoSyncSrc.tar -omosync-trunk
+set PATH=%MSYS_BIN%;%PATH%
+tar --directory=mosync-trunk -xjf MoSyncSrc.tar.bz2
+exit 0
 </command>
     </hudson.tasks.BatchFile>
     <hudson.tasks.BatchFile>
@@ -59,7 +60,7 @@ ruby workfile.rb CONFIG=
 if %errorlevel% neq 0 exit /b %errorlevel%</command>
     </hudson.tasks.BatchFile>
     <hudson.tasks.BatchFile>
-      <command>set PATH=C:/MinGW32/bin;C:/msys/1.0/bin;%WORKSPACE%/mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin;%PATH%
+      <command>set PATH=C:/MinGW/bin;C:/msys/1.0/bin;%WORKSPACE%/mosync-trunk/tools/ReleasePackageBuild/build_package_tools/mosync_bin;%PATH%
 
 junction C:\bd%BUILD_NUMBER% %WORKSPACE%\mosync-trunk
 cd C:\bd%BUILD_NUMBER%\tools\ConcurrentBuild
@@ -85,7 +86,7 @@ cd mosync-trunk
     </hudson.tasks.Fingerprinter>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
       <deleteDirs>false</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
   </buildWrappers>

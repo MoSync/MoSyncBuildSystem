@@ -5,8 +5,8 @@
   <logRotator>
     <daysToKeep>90</daysToKeep>
     <numToKeep>100</numToKeep>
-    <artifactDaysToKeep>90</artifactDaysToKeep>
-    <artifactNumToKeep>100</artifactNumToKeep>
+    <artifactDaysToKeep>10</artifactDaysToKeep>
+    <artifactNumToKeep>10</artifactNumToKeep>
   </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
@@ -28,7 +28,8 @@
         </hudson.model.ChoiceParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>MOSYNC_REPOSITORY</name>
-          <description>Enter the user name of the Github user to clone MoSync from</description>
+          <description>Enter the user name of the Github user to clone MoSync from, or a URL, like this:
+git://github.com/MoSync/MoSync.git</description>
           <defaultValue>MoSync</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -38,7 +39,7 @@
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>ECLIPSE_REPOSITORY</name>
-          <description>Enter the user name the Github user to clone Eclipse from</description>
+          <description>Enter the user name the Github user to clone Eclipse from, or a URL.</description>
           <defaultValue>MoSync</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -70,14 +71,13 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <authToken>jeofjofnwfk</authToken>
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
       <command></command>
     </hudson.tasks.Shell>
-    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.15">
+    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.16">
       <configs>
         <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
           <configs>
@@ -111,13 +111,13 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
         </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
-    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.15">
+    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.16">
       <configs>
         <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
           <configs>
             <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
           </configs>
-          <projects>Build_Windows_Runtimes, Build_Libs_Tools_Examples_On_Windows, Build_Eclipse, Build_Linux_Runtimes, Build_iOS_Runtime, Build_WP7_Runtime, Build_Libs_Tools_Examples_MoRE_On_Mac, Build_HTML5_Documentation, Build_VS2010_Libs_MoRE</projects>
+          <projects>Build_Windows_Runtimes, Build_Libs_Tools_Examples_On_Windows, Build_Linux_Runtimes, Build_Eclipse, Build_iOS_Runtime, Build_WP7_Runtime, Build_Libs_Tools_Examples_MoRE_On_Mac, Build_HTML5_Documentation, Build_WP8_Libs, Build_VS2010_Libs_MoRE</projects>
           <condition>ALWAYS</condition>
           <triggerWithNoParameters>false</triggerWithNoParameters>
           <block>
@@ -141,7 +141,35 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
         </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
-    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.15">
+    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.16">
+      <configs>
+        <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+          <configs class="java.util.Collections$EmptyList"/>
+          <projects>Build_WP8_Runtime</projects>
+          <condition>ALWAYS</condition>
+          <triggerWithNoParameters>false</triggerWithNoParameters>
+          <block>
+            <buildStepFailureThreshold>
+              <name>FAILURE</name>
+              <ordinal>2</ordinal>
+              <color>RED</color>
+            </buildStepFailureThreshold>
+            <unstableThreshold>
+              <name>UNSTABLE</name>
+              <ordinal>1</ordinal>
+              <color>YELLOW</color>
+            </unstableThreshold>
+            <failureThreshold>
+              <name>FAILURE</name>
+              <ordinal>2</ordinal>
+              <color>RED</color>
+            </failureThreshold>
+          </block>
+          <buildAllNodesWithLabel>false</buildAllNodesWithLabel>
+        </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
+      </configs>
+    </hudson.plugins.parameterizedtrigger.TriggerBuilder>
+    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.16">
       <configs>
         <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
           <configs>
@@ -174,7 +202,7 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
         </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Package_MoSync_For_Windows</projectName>
       <filter></filter>
       <target></target>
@@ -183,7 +211,7 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Package_MoSync_For_Mac</projectName>
       <filter></filter>
       <target></target>
@@ -192,7 +220,7 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.22">
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Prepare_MoSync_Source_Tarball</projectName>
       <filter>MoSyncSrc-$BUILD_ID.tar.bz2</filter>
       <target></target>

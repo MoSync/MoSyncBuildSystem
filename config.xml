@@ -1,35 +1,145 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson>
-  <disabledAdministrativeMonitors/>
-  <version>1.510</version>
-  <numExecutors>1</numExecutors>
+  <disabledAdministrativeMonitors>
+    <string>jenkins.diagnostics.SecurityIsOffMonitor</string>
+  </disabledAdministrativeMonitors>
+  <version>1.518</version>
+  <numExecutors>4</numExecutors>
   <mode>NORMAL</mode>
   <useSecurity>true</useSecurity>
   <authorizationStrategy class="hudson.security.AuthorizationStrategy$Unsecured"/>
   <securityRealm class="hudson.security.SecurityRealm$None"/>
   <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
   <workspaceDir>${ITEM_ROOTDIR}/workspace</workspaceDir>
-  <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
+  <buildsDir>/storage/JenkinsBuilds/${ITEM_FULLNAME}/builds</buildsDir>
+  <systemMessage>MoSync SDK and MoSync Reload Build System</systemMessage>
+  <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter">
+    <disableSyntaxHighlighting>false</disableSyntaxHighlighting>
+  </markupFormatter>
   <jdks/>
   <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
   <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
   <clouds/>
   <slaves>
     <slave>
-      <name>Windows_XP</name>
+      <name>windows xp</name>
       <description></description>
       <remoteFS>c:\Jenkins</remoteFS>
       <numExecutors>1</numExecutors>
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.slaves.JNLPLauncher"/>
-      <label>symbian wm windows packingwin winmosync guido</label>
+      <label>symbian wm packingwin winmosync guido windows_xp</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>2</int>
+              <string>MSYS_BIN</string>
+              <string>c:\MinGW\msys\1.0\bin\</string>
+              <string>WORKSPACE_ROOT</string>
+              <string>c:\Jenkins\workspace</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
+    </slave>
+    <slave>
+      <name>Linux_Builder</name>
+      <description></description>
+      <remoteFS>/home/mosyncbuilder/jenkinsSlave/</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>Eclipse linux</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>1</int>
+              <string>WORKSPACE_ROOT</string>
+              <string>/home/mosyncbuilder/jenkinsSlave/workspace</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
+    </slave>
+    <slave>
+      <name>MacBuilder_10.8</name>
+      <description></description>
+      <remoteFS>/Users/macbuilder/jenkinsSlave2/</remoteFS>
+      <numExecutors>2</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>ios mac108</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>1</int>
+              <string>WORKSPACE_ROOT</string>
+              <string>/Users/macbuilder/jenkinsSlave2/workspace</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
+    </slave>
+    <slave>
+      <name>Win7_Builder</name>
+      <description></description>
+      <remoteFS>c:\jenkins</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>wp7 vs2010 windows</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave[2]/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+              </default>
+              <int>2</int>
+              <string>MSYS_BIN</string>
+              <string>c:\MinGW\msys\1.0\bin\</string>
+              <string>WORKSPACE_ROOT</string>
+              <string>c:\jenkins\workspace</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
+    </slave>
+    <slave>
+      <name>Win7_Builder2</name>
+      <description></description>
+      <remoteFS>c:\jenkins</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>wp7 vs2010 windows</label>
       <nodeProperties/>
     </slave>
     <slave>
-      <name>Linux</name>
+      <name>Linux_Builder2</name>
       <description></description>
-      <remoteFS>/home/mosyncbuilder/jenkinsSlave/</remoteFS>
+      <remoteFS>/home/runtimebuilder/jenkinsSlave/</remoteFS>
       <numExecutors>1</numExecutors>
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
@@ -38,37 +148,56 @@
       <nodeProperties/>
     </slave>
     <slave>
-      <name>Mac_10.8</name>
+      <name>MacBuilder_10.6</name>
       <description></description>
-      <remoteFS>/Users/mosyncbuilder/jenkinsSlave/</remoteFS>
+      <remoteFS>/Users/mosyncbuilder/jenkinsSlave2/</remoteFS>
       <numExecutors>2</numExecutors>
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.slaves.JNLPLauncher"/>
-      <label>ios mac</label>
-      <nodeProperties/>
+      <label>mac106</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave[3]/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+              </default>
+              <int>1</int>
+              <string>WORKSPACE_ROOT</string>
+              <string>/Users/mosyncbuilder/jenkinsSlave2/workspace</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
     </slave>
     <slave>
-      <name>Windows_7</name>
-      <description></description>
-      <remoteFS>c:\jenkins</remoteFS>
+      <name>Win8</name>
+      <description>Windows 8, 64-bit, with VS2012 and WP8 SDK.</description>
+      <remoteFS>c:\Jenkins</remoteFS>
       <numExecutors>1</numExecutors>
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
       <launcher class="hudson.slaves.JNLPLauncher"/>
-      <label>wp7 vs2010</label>
-      <nodeProperties/>
-    </slave>
-    <slave>
-      <name>Mac_10.6</name>
-      <description></description>
-      <remoteFS>/Users/mosyncbuilder/jenkinsSlave/</remoteFS>
-      <numExecutors>2</numExecutors>
-      <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
-      <launcher class="hudson.slaves.JNLPLauncher"/>
-      <label>macPackaging</label>
-      <nodeProperties/>
+      <label>win8 vs2012</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>2</int>
+              <string>MSYS_BIN</string>
+              <string>c:\MinGW\msys\1.0\bin\</string>
+              <string>WORKSPACE_ROOT</string>
+              <string>c:\jenkins\workspace</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
     </slave>
   </slaves>
   <quietPeriod>5</quietPeriod>
@@ -81,6 +210,32 @@
       <filterQueue>false</filterQueue>
       <properties class="hudson.model.View$PropertyList"/>
     </hudson.model.AllView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>User</name>
+      <description>A job view for non-administrative users</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>Build_MoSync_SDK</string>
+        <string>Build_Reload</string>
+        <string>Find_MoSync_Builds</string>
+        <string>Find_Reload_Builds</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+      </columns>
+      <recurse>false</recurse>
+    </listView>
   </views>
   <primaryView>All</primaryView>
   <slaveAgentPort>0</slaveAgentPort>

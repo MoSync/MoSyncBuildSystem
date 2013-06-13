@@ -29,7 +29,7 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
       <projectName>Prepare_MoSync_Source_Tarball</projectName>
       <filter>EclipseSrc.tar.bz2</filter>
       <target></target>
@@ -39,15 +39,14 @@
     </hudson.plugins.copyartifact.CopyArtifact>
     <hudson.tasks.Shell>
       <command>mkdir eclipse-trunk
-bzip2 -d EclipseSrc.tar.bz2
 cd eclipse-trunk
-tar -x -f ../EclipseSrc.tar
+tar -xjf ../EclipseSrc.tar.bz2
 
 cd $WORKSPACE
 cp ../target-platform-$ECLIPSE_VERSION.zip eclipse-trunk/com.mobilesorcery.sdk.product/build/target-platform.zip
 </command>
     </hudson.tasks.Shell>
-    <hudson.plugins.ruby.Ruby>
+    <hudson.plugins.ruby.Ruby plugin="ruby@1.2">
       <command>require &apos;fileutils&apos;
 
 @splash = &quot;&quot;
@@ -85,7 +84,7 @@ mv buildresult/I.MoSync/MoSync-*-trimmed.zip $WORKSPACE/</command>
     </hudson.tasks.Fingerprinter>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup>
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
       <deleteDirs>false</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
   </buildWrappers>
