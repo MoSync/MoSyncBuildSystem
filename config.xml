@@ -13,9 +13,6 @@
   <workspaceDir>${ITEM_ROOTDIR}/workspace</workspaceDir>
   <buildsDir>/storage/JenkinsBuilds/${ITEM_FULLNAME}/builds</buildsDir>
   <systemMessage>MoSync SDK and MoSync Reload Build System</systemMessage>
-  <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter">
-    <disableSyntaxHighlighting>false</disableSyntaxHighlighting>
-  </markupFormatter>
   <jdks/>
   <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
   <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
@@ -137,17 +134,6 @@
       <nodeProperties/>
     </slave>
     <slave>
-      <name>Linux_Builder2</name>
-      <description></description>
-      <remoteFS>/home/runtimebuilder/jenkinsSlave/</remoteFS>
-      <numExecutors>1</numExecutors>
-      <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
-      <launcher class="hudson.slaves.JNLPLauncher"/>
-      <label>Eclipse linux</label>
-      <nodeProperties/>
-    </slave>
-    <slave>
       <name>MacBuilder_10.6</name>
       <description></description>
       <remoteFS>/Users/mosyncbuilder/jenkinsSlave2/</remoteFS>
@@ -198,6 +184,60 @@
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
       </nodeProperties>
+    </slave>
+    <slave>
+      <name>windows xp2</name>
+      <description></description>
+      <remoteFS>c:\Jenkins</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>symbian wm packingwin winmosync guido windows_xp</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>2</int>
+              <string>MSYS_BIN</string>
+              <string>c:\MinGW\msys\1.0\bin\</string>
+              <string>WORKSPACE_ROOT</string>
+              <string>c:\Jenkins\workspace</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
+      <userId>anonymous</userId>
+    </slave>
+    <slave>
+      <name>Linux_Builder2</name>
+      <description></description>
+      <remoteFS>/home/mosyncbuilder/jenkinsSlave/</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>Eclipse linux</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave[8]/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+              </default>
+              <int>1</int>
+              <string>WORKSPACE_ROOT</string>
+              <string>/home/mosyncbuilder/jenkinsSlave/workspace</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
+      <userId>anonymous</userId>
     </slave>
   </slaves>
   <quietPeriod>5</quietPeriod>
