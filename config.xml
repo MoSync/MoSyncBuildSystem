@@ -123,17 +123,6 @@
       </nodeProperties>
     </slave>
     <slave>
-      <name>Win7_Builder2</name>
-      <description></description>
-      <remoteFS>c:\jenkins</remoteFS>
-      <numExecutors>1</numExecutors>
-      <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
-      <launcher class="hudson.slaves.JNLPLauncher"/>
-      <label>wp7 vs2010 windows</label>
-      <nodeProperties/>
-    </slave>
-    <slave>
       <name>MacBuilder_10.6</name>
       <description></description>
       <remoteFS>/Users/mosyncbuilder/jenkinsSlave2/</remoteFS>
@@ -228,11 +217,39 @@
             <unserializable-parents/>
             <tree-map>
               <default>
-                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave[8]/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave[7]/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
               </default>
               <int>1</int>
               <string>WORKSPACE_ROOT</string>
               <string>/home/mosyncbuilder/jenkinsSlave/workspace</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
+      <userId>anonymous</userId>
+    </slave>
+    <slave>
+      <name>Win7_Builder2</name>
+      <description></description>
+      <remoteFS>c:\jenkins</remoteFS>
+      <numExecutors>1</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>wp7 vs2010 windows</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>2</int>
+              <string>MSYS_BIN</string>
+              <string>c:\MinGW\msys\1.0\bin\</string>
+              <string>WORKSPACE_ROOT</string>
+              <string>c:\jenkins\workspace</string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
