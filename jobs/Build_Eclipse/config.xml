@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description>Builds the Eclipse IDE for the MoSync SDK</description>
-  <logRotator>
+  <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>7</daysToKeep>
     <numToKeep>10</numToKeep>
     <artifactDaysToKeep>7</artifactDaysToKeep>
@@ -29,8 +29,8 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Prepare_MoSync_Source_Tarball</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Prepare_MoSync_Source_Tarball</project>
       <filter>EclipseSrc.tar.bz2</filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -77,6 +77,7 @@ mv buildresult/I.MoSync/MoSync-*-trimmed.zip $WORKSPACE/</command>
     <hudson.tasks.ArtifactArchiver>
       <artifacts>installer_splash.bmp, MoSync-*-trimmed.zip</artifacts>
       <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.Fingerprinter>
       <targets></targets>
@@ -84,7 +85,7 @@ mv buildresult/I.MoSync/MoSync-*-trimmed.zip $WORKSPACE/</command>
     </hudson.tasks.Fingerprinter>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.15">
       <deleteDirs>false</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
   </buildWrappers>

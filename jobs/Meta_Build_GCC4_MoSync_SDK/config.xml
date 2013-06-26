@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description>Builds the MoSync SDK, including runtimes.</description>
-  <logRotator>
+  <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>90</daysToKeep>
     <numToKeep>100</numToKeep>
     <artifactDaysToKeep>10</artifactDaysToKeep>
@@ -55,7 +55,7 @@
         <hudson.model.StringParameterDefinition>
           <name>MOSYNC_REPO</name>
           <description></description>
-          <defaultValue>git@github.com:fredrikeldh/MoSync.git</defaultValue>
+          <defaultValue>git://github.com/fredrikeldh/MoSync.git</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>MOSYNC_BRANCH</name>
@@ -105,7 +105,7 @@ If it is unchecked, ZIP files will be created instead.</description>
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.groovy.SystemGroovy plugin="groovy@1.12">
+    <hudson.plugins.groovy.SystemGroovy plugin="groovy@1.13">
       <scriptSource class="hudson.plugins.groovy.FileScriptSource">
         <scriptFile>buildSdkFast.groovy</scriptFile>
       </scriptSource>
@@ -117,10 +117,11 @@ If it is unchecked, ZIP files will be created instead.</description>
     <hudson.tasks.ArtifactArchiver>
       <artifacts>mosyncSDK*</artifacts>
       <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
     </hudson.tasks.ArtifactArchiver>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.15">
       <deleteDirs>false</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
     <com.michelin.cio.hudson.plugins.copytoslave.CopyToSlaveBuildWrapper plugin="copy-to-slave@1.4">

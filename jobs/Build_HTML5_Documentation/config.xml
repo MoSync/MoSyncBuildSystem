@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description>Builds the HTML5/Wormhole documentation on a Mac</description>
-  <logRotator>
+  <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>7</daysToKeep>
     <numToKeep>30</numToKeep>
     <artifactDaysToKeep>7</artifactDaysToKeep>
@@ -19,8 +19,8 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Prepare_MoSync_Source_Tarball</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Prepare_MoSync_Source_Tarball</project>
       <filter>MoSyncSrc.tar.bz2</filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -55,6 +55,7 @@ zip -r9 $WORKSPACE/HTML5Doc.zip eclipse</command>
     <hudson.tasks.ArtifactArchiver>
       <artifacts>HTML5Doc.zip</artifacts>
       <latestOnly>true</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.Fingerprinter>
       <targets></targets>
@@ -62,7 +63,7 @@ zip -r9 $WORKSPACE/HTML5Doc.zip eclipse</command>
     </hudson.tasks.Fingerprinter>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.15">
       <deleteDirs>false</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
   </buildWrappers>

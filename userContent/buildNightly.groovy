@@ -59,12 +59,12 @@ for(r in repos) {
 
 def SDKJob = Hudson.instance.getJob('Meta_Build_GCC4_MoSync_SDK');
 def future = SDKJob.scheduleBuild2(0, new Cause.UpstreamCause(build), new ParametersAction(buildParams));
-out.println "Waiting for the completion of ${SDKJob .displayName}";
+out.println "Waiting for the completion of ${SDKJob.displayName}";
 def SDKBuild = future.get();
 
 if(SDKBuild.result == Result.SUCCESS)
 {
-	out.println "MoSync SDK build ${SDKBuild. getAbsoluteUrl()} was successful";
+	out.println "MoSync SDK build ${SDKBuild.getAbsoluteUrl()} was successful";
 	lastBuildHashFile.write(buildHash,'ASCII');
 }
 else

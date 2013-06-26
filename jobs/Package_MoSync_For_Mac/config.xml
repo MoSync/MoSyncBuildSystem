@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description></description>
-  <logRotator>
+  <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>7</daysToKeep>
     <numToKeep>30</numToKeep>
     <artifactDaysToKeep>7</artifactDaysToKeep>
@@ -34,14 +34,14 @@
   <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Prepare_MoSync_Source_Tarball</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Prepare_MoSync_Source_Tarball</project>
       <filter>MoSyncSrc.tar.bz2</filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_Windows_Runtimes</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Build_Windows_Runtimes</project>
       <filter></filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -49,8 +49,8 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_Libs_Tools_Examples_MoRE_On_Mac</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Build_Libs_Tools_Examples_MoRE_On_Mac</project>
       <filter></filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -58,8 +58,8 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_Eclipse</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Build_Eclipse</project>
       <filter>installer_splash.bmp, MoSync-macosx.cocoa.x86_64-trimmed.zip</filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -67,8 +67,8 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_Linux_Runtimes</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Build_Linux_Runtimes</project>
       <filter></filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -76,8 +76,8 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_iOS_Runtime</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Build_iOS_Runtime</project>
       <filter></filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -85,8 +85,8 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_WP7_Runtime</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Build_WP7_Runtime</project>
       <filter></filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -94,8 +94,8 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_WP8_runtime</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Build_WP8_runtime</project>
       <filter>WP8Runtime.zip</filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -103,15 +103,15 @@
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_WP8_libs</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Build_WP8_libs</project>
       <filter>WP8Libs.zip</filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.StatusBuildSelector"/>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Build_HTML5_Documentation</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Build_HTML5_Documentation</project>
       <filter></filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -171,6 +171,7 @@ hdiutil create $WORKSPACE/MoSyncOSX-$TIMESTAMP.dmg -srcfolder $WORKSPACE/MoSyncO
     <hudson.tasks.ArtifactArchiver>
       <artifacts>MoSyncOSX-*.dmg</artifacts>
       <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.Fingerprinter>
       <targets></targets>
@@ -178,7 +179,7 @@ hdiutil create $WORKSPACE/MoSyncOSX-$TIMESTAMP.dmg -srcfolder $WORKSPACE/MoSyncO
     </hudson.tasks.Fingerprinter>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.15">
       <deleteDirs>false</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
   </buildWrappers>

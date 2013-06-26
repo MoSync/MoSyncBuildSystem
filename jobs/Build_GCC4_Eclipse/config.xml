@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description>Builds the Eclipse IDE for the MoSync SDK</description>
-  <logRotator>
+  <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>7</daysToKeep>
     <numToKeep>10</numToKeep>
     <artifactDaysToKeep>7</artifactDaysToKeep>
@@ -52,6 +52,21 @@
           <description></description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>MOSYNC_REPO</name>
+          <description></description>
+          <defaultValue>git://github.com/fredrikeldh/MoSync.git</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>MOSYNC_BRANCH</name>
+          <description></description>
+          <defaultValue>gcc4-bb10</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>MOSYNC_HASH</name>
+          <description></description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -72,6 +87,7 @@
     <hudson.tasks.ArtifactArchiver>
       <artifacts>installer_splash.bmp, MoSync-*-trimmed.zip</artifacts>
       <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.Fingerprinter>
       <targets></targets>
@@ -79,7 +95,7 @@
     </hudson.tasks.Fingerprinter>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.15">
       <deleteDirs>false</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
     <com.michelin.cio.hudson.plugins.copytoslave.CopyToSlaveBuildWrapper plugin="copy-to-slave@1.4">

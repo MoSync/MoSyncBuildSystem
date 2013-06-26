@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description>Builds the entire MoSync SDK package for Windows and Mac</description>
-  <logRotator>
+  <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>90</daysToKeep>
     <numToKeep>100</numToKeep>
     <artifactDaysToKeep>10</artifactDaysToKeep>
@@ -10,7 +10,7 @@
   </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <hudson.plugins.zentimestamp.ZenTimestampJobProperty plugin="zentimestamp@3.2">
+    <hudson.plugins.zentimestamp.ZenTimestampJobProperty plugin="zentimestamp@3.3">
       <changeBUILDID>true</changeBUILDID>
       <pattern>yyMMdd-HHmm</pattern>
     </hudson.plugins.zentimestamp.ZenTimestampJobProperty>
@@ -77,7 +77,7 @@ git://github.com/MoSync/MoSync.git</description>
     <hudson.tasks.Shell>
       <command></command>
     </hudson.tasks.Shell>
-    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.16">
+    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.18">
       <configs>
         <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
           <configs>
@@ -111,7 +111,7 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
         </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
-    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.16">
+    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.18">
       <configs>
         <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
           <configs>
@@ -141,10 +141,10 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
         </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
-    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.16">
+    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.18">
       <configs>
         <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
-          <configs class="java.util.Collections$EmptyList"/>
+          <configs class="empty-list"/>
           <projects>Build_WP8_Runtime</projects>
           <condition>ALWAYS</condition>
           <triggerWithNoParameters>false</triggerWithNoParameters>
@@ -169,7 +169,7 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
         </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
-    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.16">
+    <hudson.plugins.parameterizedtrigger.TriggerBuilder plugin="parameterized-trigger@2.18">
       <configs>
         <hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
           <configs>
@@ -202,8 +202,8 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
         </hudson.plugins.parameterizedtrigger.BlockableBuildTriggerConfig>
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Package_MoSync_For_Windows</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Package_MoSync_For_Windows</project>
       <filter></filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -211,8 +211,8 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Package_MoSync_For_Mac</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Package_MoSync_For_Mac</project>
       <filter></filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -220,8 +220,8 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
       </selector>
       <optional>true</optional>
     </hudson.plugins.copyartifact.CopyArtifact>
-    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.25">
-      <projectName>Prepare_MoSync_Source_Tarball</projectName>
+    <hudson.plugins.copyartifact.CopyArtifact plugin="copyartifact@1.27">
+      <project>Prepare_MoSync_Source_Tarball</project>
       <filter>MoSyncSrc-$BUILD_ID.tar.bz2</filter>
       <target></target>
       <selector class="hudson.plugins.copyartifact.PermalinkBuildSelector">
@@ -234,10 +234,11 @@ BUILD_INFO = BUILD_NUMBER=$BUILD_NUMBER\nBUILD_ID=$BUILD_ID\nMOSYNC_REPOSITORY=$
     <hudson.tasks.ArtifactArchiver>
       <artifacts>*</artifacts>
       <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
     </hudson.tasks.ArtifactArchiver>
   </publishers>
   <buildWrappers>
-    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.10">
+    <hudson.plugins.ws__cleanup.PreBuildCleanup plugin="ws-cleanup@0.15">
       <deleteDirs>false</deleteDirs>
     </hudson.plugins.ws__cleanup.PreBuildCleanup>
   </buildWrappers>

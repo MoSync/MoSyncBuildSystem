@@ -3,6 +3,8 @@
 *.log
 
 nextBuildNumber
+lastStable
+lastSuccessful
 last*Build
 .owner
 identity.key
@@ -23,6 +25,7 @@ workspace
 /queue.xml
 /nodeMonitors.xml
 /hudson.*.xml
+/com.*.xml
 /jre
 /jenkins.xml
 /jenkins.*.xml

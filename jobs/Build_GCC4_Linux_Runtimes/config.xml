@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description>Builds any runtimes that can be built on Linux</description>
-  <logRotator>
+  <logRotator class="hudson.tasks.LogRotator">
     <daysToKeep>7</daysToKeep>
     <numToKeep>30</numToKeep>
     <artifactDaysToKeep>7</artifactDaysToKeep>
@@ -15,7 +15,7 @@
         <hudson.model.StringParameterDefinition>
           <name>MOSYNC_REPO</name>
           <description></description>
-          <defaultValue>git@github.com:fredrikeldh/MoSync.git</defaultValue>
+          <defaultValue>git://github.com/fredrikeldh/MoSync.git</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>MOSYNC_BRANCH</name>
@@ -52,6 +52,7 @@
     <hudson.tasks.ArtifactArchiver>
       <artifacts>linuxRuntimes.zip</artifacts>
       <latestOnly>true</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.Fingerprinter>
       <targets></targets>

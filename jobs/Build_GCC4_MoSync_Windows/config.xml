@@ -39,7 +39,7 @@
         <hudson.model.StringParameterDefinition>
           <name>MOSYNC_REPO</name>
           <description></description>
-          <defaultValue>git@github.com:fredrikeldh/MoSync.git</defaultValue>
+          <defaultValue>git://github.com/fredrikeldh/MoSync.git</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>MOSYNC_BRANCH</name>
@@ -76,6 +76,7 @@
     <hudson.tasks.ArtifactArchiver>
       <artifacts>mosync.zip</artifacts>
       <latestOnly>false</latestOnly>
+      <allowEmptyArchive>false</allowEmptyArchive>
     </hudson.tasks.ArtifactArchiver>
   </publishers>
   <buildWrappers>
