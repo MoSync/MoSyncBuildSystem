@@ -48,11 +48,6 @@
           <defaultValue>featured</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
-          <name>TIMESTAMP</name>
-          <description></description>
-          <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
           <name>MOSYNC_REPO</name>
           <description></description>
           <defaultValue>git://github.com/fredrikeldh/MoSync.git</defaultValue>
@@ -67,6 +62,17 @@
           <description></description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>TIMESTAMP</name>
+          <description>This is normally set by buildSdkFast.groovy to buildId().
+Leaving this empty causes the build script to use BUILD_ID and BUILD_NUMBER instead.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>CLEAN_WORKSPACE</name>
+          <description></description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>

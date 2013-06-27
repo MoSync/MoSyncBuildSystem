@@ -19,6 +19,7 @@ repos = [
 	new Repo('MOSYNC', 'git://github.com/fredrikeldh/MoSync.git', 'gcc4-bb10'),
 	new Repo('BINUTILS', 'git://github.com/fredrikeldh/binutils-mapip2.git', 'mosync'),
 	new Repo('GCC', 'git://github.com/fredrikeldh/gcc4-mapip2.git', 'float'),
+	new Repo('ECLIPSE', 'git://github.com/fredrikeldh/Eclipse.git', 'master'),
 ]
 
 def buildHash = '';
@@ -47,6 +48,7 @@ if(lastBuildHashFile.exists())
 def buildParams = [
 	new StringParameterValue('BUILD_MODE', 'nightly'),
 	new StringParameterValue('Clean workspace', 'true'),
+	new StringParameterValue('Build eclipse', 'true'),
 ];
 
 for(r in repos) {

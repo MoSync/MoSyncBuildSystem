@@ -83,6 +83,11 @@
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
+          <name>Build eclipse</name>
+          <description>Build the Eclipse IDE. Highly recommended when building installers.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
           <name>Create installers</name>
           <description>Create installer packages for the platforms that support it (Windows, Mac). If this box is checked, Linux build is disabled.
 If it is unchecked, ZIP files will be created instead.</description>

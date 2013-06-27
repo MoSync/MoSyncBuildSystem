@@ -11,8 +11,10 @@ end
 @ENV = {}
 
 def env(name)
-	self.class.const_set(name, ENV[name.to_s])
-	@ENV[name.to_s] = ENV[name.to_s]
+	e = ENV[name.to_s]
+	#raise "Missing environment variable #{name}!" if(!e)
+	self.class.const_set(name, e)
+	@ENV[name.to_s] = e
 end
 
 Remote = Struct.new(:url, :branch)
@@ -24,6 +26,8 @@ env(:TIMESTAMP)
 env(:NODE_LABELS)
 env(:WORKSPACE_ROOT)
 env(:CLEAN_WORKSPACE)
+env(:BUILD_ID)
+env(:BUILD_NUMBER)
 
 if(CLEAN_WORKSPACE == 'true')
 	# Save the .rb files
@@ -120,6 +124,8 @@ def checkout(jenkinsName, remoteUrl, branch, hash, localDir, lf)
 	open("MoSync/bin/version_#{jenkinsName}.txt", 'w') do |file|
 		file.puts hash
 	end
+	# return value is used by buildEclipse.rb
+	return hash
 end
 
 # Copy src file to dest directory, if dest file is older than src.
@@ -134,6 +140,7 @@ end
 
 def prepareRuntimeBuild(zipName)
 	rm_f(zipName)
+	raise "Deletion of old file (#{zipName}) failed!" if(File.exist?(zipName))
 
 	# Define constants.
 	env(:MOSYNC_REPO)

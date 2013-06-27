@@ -22,6 +22,7 @@ class Container {
 	private resolver = build.buildVariableResolver;
 	private out;
 	private boolean CREATE_INSTALLERS = (resolver.resolve("Create installers") == "true");
+	private boolean BUILD_ECLIPSE = (resolver.resolve("Build eclipse") == "true");
 
 	Container(o) { out = o; }
 
@@ -46,7 +47,7 @@ class Container {
 		new Repo('MOSYNC'),
 		new Repo('BINUTILS'),
 		new Repo('GCC'),
-		//new Repo('ECLIPSE'),
+		new Repo('ECLIPSE'),
 	]
 
 	private buildParams = [
@@ -80,7 +81,25 @@ class Container {
 			def artifacts = b.getArtifacts();
 			out.println "${artifacts.size()} artifacts."
 			for(a in artifacts) {
-				def cmd = "unzip -n -q ${a.getFile().getPath()}"
+				def path = a.getFile().getPath();
+				if(jib.exdir == 'ECLIPSE') {	// magic word
+					String dst;	// Matches array "platforms", defined below, in doJobs().
+					if(path.contains('MoSync-win32.win32.x86-trimmed.zip'))
+						dst = 'Windows/MoSync';
+					else if(path.contains('MoSync-macosx.cocoa.x86_64-trimmed.zip'))
+						dst = 'Mac/MoSync';
+					else
+						dst = null;
+					// Unzip Eclipse builds in the proper places.
+					if(dst != null) {
+						IOUtils.mkdirs(newFile(dst));
+						def cmd = "unzip -n -q ${a.getFile().getPath()}"
+						exec(cmd, dst);
+						exec('mv mosync eclipse', dst);
+					}
+					continue;
+				}
+				def cmd = "unzip -n -q ${path}"
 				if(jib.exdir != null) {
 					IOUtils.mkdirs(newFile(jib.exdir));
 					cmd += " -d ${jib.exdir}"
@@ -152,10 +171,13 @@ class Container {
 			start('Build_GCC4_WP7_Runtime'),
 			start('Build_GCC4_xp_Runtimes'),
 			start('Build_GCC4_Linux_Runtimes'),
-			//start('Prepare_source_tarball'),
 		]
 
 		def allJobs = runtimeJobs + platformJobs;
+
+		if(BUILD_ECLIPSE) {
+			allJobs += start('Build_GCC4_Eclipse', 'ECLIPSE' /* magic word */);
+		}
 
 		allJobs.each {
 			out.println "Waiting on start of job ${it.job.displayName}...";

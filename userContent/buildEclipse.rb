@@ -11,17 +11,15 @@ env(:ECLIPSE_VERSION)
 env(:MOSYNC_REPO)
 env(:MOSYNC_BRANCH)
 env(:MOSYNC_HASH)
-env(:BUILD_MODE)
-env(:TIMESTAMP)
-
 
 mkdir_p('MoSync/bin')
 # checkout code
-checkout('Eclipse', ECLIPSE_REPO, ECLIPSE_BRANCH, ECLIPSE_HASH, 'eclipse-source', false)
-checkout('MoSync', MOSYNC_REPO, MOSYNC_BRANCH, MOSYNC_HASH, 'MoSync-source', false)
+eHash = checkout('Eclipse', ECLIPSE_REPO, ECLIPSE_BRANCH, ECLIPSE_HASH, 'eclipse-source', false)
+mHash = checkout('MoSync', MOSYNC_REPO, MOSYNC_BRANCH, MOSYNC_HASH, 'MoSync-source', false)
 
 # copy the target platform file
 cd WORKSPACE
+mkdir_p('eclipse-source/com.mobilesorcery.sdk.product/build')
 cp_u("../target-platform-#{ECLIPSE_VERSION}.zip", 'eclipse-source/com.mobilesorcery.sdk.product/build/target-platform.zip')
 
 # prepare the install and start-up splash screen
@@ -49,16 +47,23 @@ else
 	"Developer\'s Snapshot"
 end
 
+timestamp = TIMESTAMP
+if(!timestamp)
+	timestamp = "#{BUILD_ID}-#{BUILD_NUMBER}"
+end
+# Can't use strip! on frozen strings.
+timestamp = timestamp.strip
+
 if(BUILD_MODE != "re")
-	@splash = "\"#{revisionText}\" #{TIMESTAMP.strip} #{MOSYNC_HASH.strip} #{ECLIPSE_HASH.strip}"
+	@splash = "\"#{revisionText}\" #{timestamp} #{eHash} #{mHash}"
 else
-	@splash = "\"#{revisionText}\" #{TIMESTAMP.strip} "##{MOSYNC_HASH.strip} #{ECLIPSE_HASH.strip}"
+	@splash = "\"#{revisionText}\" #{timestamp} "##{MOSYNC_HASH.strip} #{ECLIPSE_HASH.strip}"
 end
 
 File.open("MoSync/bin/version.dat", "w") do |file|
 	file.puts revisionText
-	file.puts TIMESTAMP
-	puts "Date: #{TIMESTAMP}"
+	file.puts timestamp
+	puts "Date: #{timestamp}"
 	file.puts MOSYNC_HASH
 	puts "MoSync Hash: #{MOSYNC_HASH}"
 	file.puts ECLIPSE_HASH
