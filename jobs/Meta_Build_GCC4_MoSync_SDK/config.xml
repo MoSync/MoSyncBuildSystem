@@ -98,6 +98,11 @@ If it is unchecked, ZIP files will be created instead.</description>
           <description>Remove all files from the job&apos;s workspace before building. This setting is inherited by all child jobs.</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>Skip long builds</name>
+          <description>Don&apos;t build runtimes or Eclipse. Useful for testing of post-build steps.</description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>

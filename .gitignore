@@ -17,6 +17,7 @@ workspace
 /logs
 /userContent/MoSyncRepos
 /userContent/readme.txt
+/userContent/nightlyPostBuildStep.rb
 /plugins
 /storage
 /updates

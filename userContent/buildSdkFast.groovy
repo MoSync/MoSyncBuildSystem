@@ -23,6 +23,7 @@ class Container {
 	private out;
 	private boolean CREATE_INSTALLERS = (resolver.resolve("Create installers") == "true");
 	private boolean BUILD_ECLIPSE = (resolver.resolve("Build eclipse") == "true");
+	private boolean SKIP_LONG_BUILDS = (resolver.resolve("Skip long builds") == "true");
 
 	Container(o) { out = o; }
 
@@ -166,17 +167,22 @@ class Container {
 
 		def platformJobs = platforms.collect { start('Build_GCC4_MoSync_'+it, it) }
 
-		def runtimeJobs = [
-			start('Build_GCC4_iOS_Runtime'),
-			start('Build_GCC4_WP7_Runtime'),
-			start('Build_GCC4_xp_Runtimes'),
-			start('Build_GCC4_Linux_Runtimes'),
-		]
+		def allJobs = platformJobs;
+		def runtimeJobs = [];
 
-		def allJobs = runtimeJobs + platformJobs;
+		if(!SKIP_LONG_BUILDS) {
+			runtimeJobs = [
+				start('Build_GCC4_iOS_Runtime'),
+				start('Build_GCC4_WP7_Runtime'),
+				start('Build_GCC4_xp_Runtimes'),
+				start('Build_GCC4_Linux_Runtimes'),
+			]
 
-		if(BUILD_ECLIPSE) {
-			allJobs += start('Build_GCC4_Eclipse', 'ECLIPSE' /* magic word */);
+			allJobs += runtimeJobs;
+
+			if(BUILD_ECLIPSE) {
+				allJobs += start('Build_GCC4_Eclipse', 'ECLIPSE' /* magic word */);
+			}
 		}
 
 		allJobs.each {
@@ -245,8 +251,11 @@ class Container {
 					platformJobs.each {
 						if(it.unpacked && !it.packed) {
 							def platform = it.exdir;
-							def cmd = "zip -9 -q -r mosyncSDK-${platform}-${buildId()}.zip MoSync"
-							exec(cmd, '.');
+							String cmd;
+							if(!SKIP_LONG_BUILDS) {
+								cmd = "zip -9 -q -r mosyncSDK-${platform}-${buildId()}.zip MoSync"
+								exec(cmd, '.');
+							}
 
 							cmd = "zip -9 -q -r ../mosyncSDK-${platform}-${buildId()}.zip MoSync"
 							exec(cmd, "./${platform}");

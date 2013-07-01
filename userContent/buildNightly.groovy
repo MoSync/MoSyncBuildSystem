@@ -5,6 +5,22 @@ import jenkins.model.*
 
 def build = Thread.currentThread().executable;
 
+def newFile(String dir) {
+	return new File(build.getWorkspace().toString() + '/' + dir);
+}
+
+def exec(String cmd, String dir) {
+	def f = newFile(dir);
+	out.println "${f}: ${cmd}";
+	def p = cmd.execute(null, f);
+	p.waitForProcessOutput(out, out);
+	int res = p.exitValue();
+	if(res == 0)
+		return;
+	out.println "Command failed: ${res}";
+	exit(res);
+}
+
 class Repo {
 	String name, url, branch, hash;
 
@@ -49,6 +65,7 @@ def buildParams = [
 	new StringParameterValue('BUILD_MODE', 'nightly'),
 	new StringParameterValue('Clean workspace', 'true'),
 	new StringParameterValue('Build eclipse', 'true'),
+	new StringParameterValue('Skip long builds', 'false'),
 ];
 
 for(r in repos) {
@@ -68,6 +85,19 @@ if(SDKBuild.result == Result.SUCCESS)
 {
 	out.println "MoSync SDK build ${SDKBuild.getAbsoluteUrl()} was successful";
 	lastBuildHashFile.write(buildHash,'ASCII');
+
+	// If nightlyPostBuildStep.rb exists, run it, with the paths of all the artifacts as parameters.
+
+	if(newFile('nightlyPostBuildStep.rb').exists())
+	{
+		String cmd = 'ruby nightlyPostBuildStep.rb';
+		def artifacts = SDKBuild.getArtifacts();
+		for(a in artifacts) {
+			def path = a.getFile().getPath();
+			cmd += ' ' + path;
+		}
+		exec(cmd, '.');
+	}
 }
 else
 {
