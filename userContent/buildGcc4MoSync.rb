@@ -4,10 +4,6 @@ require './common.rb'
 
 rm_f('mosync.zip')
 
-# Todo: Add option to clear this directory.
-# Should be used by nightlies, when we don't care how long it takes.
-#rm_rf('MoSync')
-
 # Define constants.
 env(:GCC_REPO)
 env(:GCC_BRANCH)
@@ -105,4 +101,4 @@ end
 
 # Pack results.
 cd WORKSPACE
-sh "zip -9 -r mosync.zip MoSync -x MoSync/build/* MoSync/build/"
+sh "zip -9 -r mosync.zip MoSync --exclude=MoSync/build/*"

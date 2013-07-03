@@ -91,7 +91,7 @@ Leaving this empty causes the build script to use BUILD_ID and BUILD_NUMBER inst
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>installer_splash.bmp, MoSync-*-trimmed.zip</artifacts>
+      <artifacts>installer_splash.bmp, MoSync-*-trimmed.zip, version.dat</artifacts>
       <latestOnly>false</latestOnly>
       <allowEmptyArchive>false</allowEmptyArchive>
     </hudson.tasks.ArtifactArchiver>

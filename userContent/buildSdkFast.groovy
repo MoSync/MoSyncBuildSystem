@@ -94,9 +94,13 @@ class Container {
 					// Unzip Eclipse builds in the proper places.
 					if(dst != null) {
 						IOUtils.mkdirs(newFile(dst));
-						def cmd = "unzip -n -q ${a.getFile().getPath()}"
+						def cmd = "unzip -n -q ${path}"
 						exec(cmd, dst);
 						exec('mv mosync eclipse', dst);
+					}
+					else if(path.contains('version.dat')) {
+						IOUtils.mkdirs(newFile('MoSync/bin'));
+						exec("cp ${path} .", 'MoSync/bin');
 					}
 					continue;
 				}
@@ -169,6 +173,7 @@ class Container {
 
 		def allJobs = platformJobs;
 		def runtimeJobs = [];
+		def otherJobs = [];
 
 		if(!SKIP_LONG_BUILDS) {
 			runtimeJobs = [
@@ -179,17 +184,31 @@ class Container {
 			]
 
 			allJobs += runtimeJobs;
-
-			if(BUILD_ECLIPSE) {
-				allJobs += start('Build_GCC4_Eclipse', 'ECLIPSE' /* magic word */);
-			}
 		}
+
+		if(BUILD_ECLIPSE) {
+			otherJobs += start('Build_GCC4_Eclipse', 'ECLIPSE' /* magic word */);
+		}
+
+		allJobs += otherJobs;
 
 		allJobs.each {
 			out.println "Waiting on start of job ${it.job.displayName}...";
 			it.build = it.future.waitForStart();
 			out.println "Job ${it.job.displayName} started.";
 		}
+
+		// write buildinfo
+		String bi = "BUILD_NUMBER=${build.number}\n"+
+			"BUILD_ID=${buildId()}\n"+
+			"CREATE_INSTALLERS=${CREATE_INSTALLERS}\n"+
+			"BUILD_ECLIPSE=${BUILD_ECLIPSE}\n"+
+			"SKIP_LONG_BUILDS=${SKIP_LONG_BUILDS}\n";
+		buildParams.each {
+			bi += "${it.name}=${it.value}\n";
+		}
+		IOUtils.mkdirs(newFile('MoSync/bin'));
+		newFile('MoSync/bin/buildinfo.txt').write(bi);
 
 		if(CREATE_INSTALLERS) {
 			while(true) {
@@ -246,19 +265,25 @@ class Container {
 					if(!it.unpacked)
 						runtimesDone = false;
 				}
-				if(runtimesDone) {
+				boolean otherDone = true;
+				otherJobs.each {
+					if(!it.unpacked)
+						otherDone = false;
+				}
+				if(runtimesDone && otherDone) {
 					boolean allDone = true;
 					platformJobs.each {
 						if(it.unpacked && !it.packed) {
 							def platform = it.exdir;
 							String cmd;
-							if(!SKIP_LONG_BUILDS) {
-								cmd = "zip -9 -q -r mosyncSDK-${platform}-${buildId()}.zip MoSync"
-								exec(cmd, '.');
-							}
+
+							cmd = "zip -9 -q -r mosyncSDK-${platform}-${buildId()}.zip MoSync"
+							exec(cmd, '.');
 
 							cmd = "zip -9 -q -r ../mosyncSDK-${platform}-${buildId()}.zip MoSync"
 							exec(cmd, "./${platform}");
+
+							it.packed = true;
 						} else {
 							allDone = false;
 						}

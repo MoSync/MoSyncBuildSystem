@@ -55,7 +55,7 @@ end
 timestamp = timestamp.strip
 
 if(BUILD_MODE != "re")
-	@splash = "\"#{revisionText}\" #{timestamp} #{eHash} #{mHash}"
+	@splash = "\"#{revisionText}\" #{timestamp} #{mHash} #{eHash}"
 else
 	@splash = "\"#{revisionText}\" #{timestamp} "##{MOSYNC_HASH.strip} #{ECLIPSE_HASH.strip}"
 end
@@ -64,10 +64,10 @@ File.open("MoSync/bin/version.dat", "w") do |file|
 	file.puts revisionText
 	file.puts timestamp
 	puts "Date: #{timestamp}"
-	file.puts MOSYNC_HASH
-	puts "MoSync Hash: #{MOSYNC_HASH}"
-	file.puts ECLIPSE_HASH
-	puts "Eclipse Hash: #{ECLIPSE_HASH}"
+	file.puts mHash
+	puts "MoSync Hash: #{mHash}"
+	file.puts eHash
+	puts "Eclipse Hash: #{eHash}"
 end
 
 puts "Splash:"
@@ -82,4 +82,8 @@ cp_u("installer_splash.bmp", WORKSPACE + "/installer_splash.bmp")
 cd WORKSPACE + '/eclipse-source/com.mobilesorcery.sdk.product/build'
 sh "ant release"
 
+# Store results for archiving.
 FileUtils.mv Dir.glob("buildresult/I.MoSync/MoSync-*-trimmed.zip"), WORKSPACE
+
+cd WORKSPACE
+FileUtils.mv "MoSync/bin/version.dat", WORKSPACE

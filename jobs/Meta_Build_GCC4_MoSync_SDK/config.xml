@@ -70,7 +70,7 @@
         <hudson.model.StringParameterDefinition>
           <name>ECLIPSE_REPO</name>
           <description></description>
-          <defaultValue>git://github.com/MoSync/Eclipse.git</defaultValue>
+          <defaultValue>git://github.com/fredrikeldh/Eclipse.git</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>ECLIPSE_BRANCH</name>
@@ -85,7 +85,7 @@
         <hudson.model.BooleanParameterDefinition>
           <name>Build eclipse</name>
           <description>Build the Eclipse IDE. Highly recommended when building installers.</description>
-          <defaultValue>false</defaultValue>
+          <defaultValue>true</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>Create installers</name>
